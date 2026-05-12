@@ -292,12 +292,12 @@ End with a single sentence summary verdict: e.g. "Solid week — deficit is work
   return (
     <div className="page">
       <div className="card" style={{ borderColor: checkInDue ? 'var(--accent)' : 'var(--border)', background: checkInDue ? '#050f00' : 'var(--surface)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
+        <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
-            <div className="card-title" style={{ marginBottom: 4, color: checkInDue ? 'var(--accent)' : 'var(--text2)' }}>
+            <div className="card-title mb-1" style={{ color: checkInDue ? 'var(--accent)' : 'var(--text2)' }}>
               {checkInDue ? '📋 Weekly Check-In Due' : '📋 Weekly Check-In'}
             </div>
-            <div style={{ fontSize: 12, color: 'var(--text3)', lineHeight: 1.5 }}>
+            <div className="text-xs leading-normal" style={{ color: 'var(--text3)' }}>
               {daysSinceCheckIn === null
                 ? 'No check-in logged yet. Get your first full assessment.'
                 : checkInDue
@@ -305,17 +305,21 @@ End with a single sentence summary verdict: e.g. "Solid week — deficit is work
                   : `Last check-in ${daysSinceCheckIn} day${daysSinceCheckIn === 1 ? '' : 's'} ago — next due in ${7 - daysSinceCheckIn} day${7 - daysSinceCheckIn === 1 ? '' : 's'}.`}
             </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+          <div className="flex flex-col items-end gap-1">
             <button
-              className="btn btn-primary btn-sm"
+              className="btn btn-primary btn-sm min-w-[120px]"
               onClick={runWeeklyCheckIn}
               disabled={loading}
-              style={{ background: checkInDue ? 'var(--accent)' : 'var(--surface3)', color: checkInDue ? '#000' : 'var(--text2)', borderColor: checkInDue ? 'var(--accent)' : 'var(--border)', minWidth: 120 }}
+              style={{
+                background: checkInDue ? 'var(--accent)' : 'var(--surface3)',
+                color: checkInDue ? '#000' : 'var(--text2)',
+                borderColor: checkInDue ? 'var(--accent)' : 'var(--border)',
+              }}
             >
               {loading && checkInRunning ? 'Assessing...' : 'Run Check-In'}
             </button>
             {!checkInDue && (
-              <button className="btn btn-secondary btn-sm" style={{ fontSize: 11 }} onClick={runWeeklyCheckIn} disabled={loading}>
+              <button className="btn btn-secondary btn-sm text-[11px]" onClick={runWeeklyCheckIn} disabled={loading}>
                 Run anyway
               </button>
             )}
@@ -324,18 +328,20 @@ End with a single sentence summary verdict: e.g. "Solid week — deficit is work
       </div>
 
       <div className="card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-          <div className="card-title" style={{ marginBottom: 0 }}>Quick Prompts</div>
-          <span style={{
-            fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, letterSpacing: 1,
-            textTransform: 'uppercase', padding: '2px 8px', borderRadius: 3,
-            color: PHASES.find(p => p.id === phase)?.color || 'var(--text2)',
-            border: `1px solid ${PHASES.find(p => p.id === phase)?.color || 'var(--border)'}`,
-            background: 'var(--surface3)',
-          }}>{phase} coaching</span>
+        <div className="mb-2.5 flex items-center justify-between">
+          <div className="card-title mb-0">Quick Prompts</div>
+          <span
+            className="rounded-[3px] border px-2 py-0.5 text-[11px] font-bold uppercase tracking-[1px]"
+            style={{
+              fontFamily: 'var(--font-display)',
+              color: PHASES.find(p => p.id === phase)?.color || 'var(--text2)',
+              borderColor: PHASES.find(p => p.id === phase)?.color || 'var(--border)',
+              background: 'var(--surface3)',
+            }}
+          >{phase} coaching</span>
         </div>
-        <div style={{ fontSize: 13, color: 'var(--text3)', marginBottom: 10 }}>Your coach has access to all your session history, volume data, body composition, and current phase.</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 0 }}>
+        <div className="mb-2.5 text-[13px]" style={{ color: 'var(--text3)' }}>Your coach has access to all your session history, volume data, body composition, and current phase.</div>
+        <div className="flex flex-wrap gap-1.5">
           {prompts.map(p => (
             <button key={p} className="btn btn-secondary btn-sm" onClick={() => sendMessage(p)} disabled={loading}>{p}</button>
           ))}
@@ -344,20 +350,20 @@ End with a single sentence summary verdict: e.g. "Solid week — deficit is work
 
       <div className="card">
         {messages.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text3)', fontSize: 13 }}>
+          <div className="py-6 text-center text-[13px]" style={{ color: 'var(--text3)' }}>
             No conversation yet. Run a check-in or tap a prompt above.
           </div>
         )}
         {messages.map((m, i) => (
-          <div key={i} className="ai-box" style={{ borderLeftColor: m.role === 'user' ? 'var(--accent2)' : 'var(--accent)', marginBottom: 10 }}>
+          <div key={i} className="ai-box mb-2.5" style={{ borderLeftColor: m.role === 'user' ? 'var(--accent2)' : 'var(--accent)' }}>
             <div className="ai-label">{m.role === 'user' ? 'You' : 'Coach'}</div>
             <div className="ai-text">
               {m.content
                 ? m.content
                 : loading && i === messages.length - 1
-                  ? <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  ? <div className="flex items-center gap-2.5">
                       <div className="loading-dots"><span /><span /><span /></div>
-                      <span style={{ fontSize: 12, color: 'var(--text3)' }}>Thinking...</span>
+                      <span className="text-xs" style={{ color: 'var(--text3)' }}>Thinking...</span>
                     </div>
                   : ''}
             </div>

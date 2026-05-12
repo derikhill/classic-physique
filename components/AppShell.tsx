@@ -234,6 +234,11 @@ export default function AppShell() {
     await updateSettings({ last_checkin: iso })
   }
 
+  const handleUpdateCoachSplit = async (split: CoachSplit) => {
+    setActiveCoachSplit(split)
+    await updateSettings({ active_coach_split: split })
+  }
+
   const handleSwitchProgram = async (newName: string, coachSplit: CoachSplit | null = null) => {
     const sorted = [...workouts].sort((a, b) => a.date.localeCompare(b.date))
     const archive: ArchivedProgram = {
@@ -260,7 +265,7 @@ export default function AppShell() {
   }
 
   if (!loaded) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#0a0a0a' }}>
+    <div className="flex h-screen items-center justify-center" style={{ background: '#0a0a0a' }}>
       <div className="loading-dots"><span /><span /><span /></div>
     </div>
   )
@@ -269,16 +274,18 @@ export default function AppShell() {
 
   return (
     <div className="app">
-      <nav className="nav">
-        <div className="nav-brand">CLASSIC PHYSIQUE</div>
-        <div className="nav-tabs">
+      <nav className="nav flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div className="flex items-center justify-between sm:contents">
+          <div className="nav-brand sm:order-1">CLASSIC PHYSIQUE</div>
+          <div className="flex items-center gap-2 sm:order-3">
+            <div className="phase-badge" style={{ borderColor: currentPhase?.color, color: currentPhase?.color }}>{currentPhase?.label}</div>
+            <button className="btn-swap" onClick={handleSignOut} title="Sign out">⎋</button>
+          </div>
+        </div>
+        <div className="nav-tabs sm:order-2">
           {TABS.map(t => (
             <button key={t.id} className={`nav-tab ${tab === t.id ? 'active' : ''}`} onClick={() => setTab(t.id)}>{t.label}</button>
           ))}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div className="phase-badge" style={{ borderColor: currentPhase?.color, color: currentPhase?.color }}>{currentPhase?.label}</div>
-          <button className="btn-swap" onClick={handleSignOut} title="Sign out">⎋</button>
         </div>
       </nav>
       {tab === 'dashboard' && <Dashboard workouts={workouts} phase={phase} onNavigate={setTab} />}
@@ -330,10 +337,13 @@ export default function AppShell() {
           phaseGoals={phaseGoals}
           onPhaseGoals={handlePhaseGoals}
           customExercises={customExercises}
+          onSaveCustomExercise={handleSaveCustomExercise}
           onDeleteCustomExercise={handleDeleteCustomExercise}
           splitOrder={splitOrder}
           onSplitOrder={handleSplitOrder}
           activeCoachSplit={activeCoachSplit}
+          onUpdateCoachSplit={handleUpdateCoachSplit}
+          currentProgramName={currentProgramName}
         />
       )}
     </div>

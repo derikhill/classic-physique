@@ -74,28 +74,32 @@ export default function HistoryEntry({
   return (
     <div className="history-entry" style={{ borderColor: editing ? 'var(--accent)' : 'var(--border)' }}>
       <div className="history-header">
-        <div style={{ flex: 1, marginRight: 8 }}>
+        <div className="mr-2 flex-1">
           {editing && draft ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div className="flex flex-col gap-1.5">
               <input
-                className="inp"
+                className="inp text-base font-bold uppercase"
                 value={draft.splitDay}
                 onChange={e => updateDraftField('splitDay', e.target.value)}
                 placeholder="Session title"
-                style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 16, color: 'var(--accent)', textTransform: 'uppercase' }}
+                style={{ fontFamily: 'var(--font-display)', color: 'var(--accent)' }}
               />
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-                <input type="date" className="inp" style={{ width: 150 }} value={draft.date} onChange={e => updateDraftField('date', e.target.value)} />
-                <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                  <span style={{ fontSize: 11, color: 'var(--text3)', fontFamily: 'var(--font-display)', letterSpacing: 1, textTransform: 'uppercase' }}>Feel:</span>
+              <div className="flex flex-wrap items-center gap-2">
+                <input type="date" className="inp w-[150px]" value={draft.date} onChange={e => updateDraftField('date', e.target.value)} />
+                <div className="flex items-center gap-1">
+                  <span className="text-[11px] uppercase tracking-[1px]" style={{ color: 'var(--text3)', fontFamily: 'var(--font-display)' }}>Feel:</span>
                   {[1, 2, 3, 4, 5].map(n => (
-                    <button key={n} onClick={() => updateDraftField('feel', n)} style={{
-                      width: 30, height: 30, borderRadius: 4, border: '1px solid',
-                      borderColor: draft.feel === n ? 'var(--accent)' : 'var(--border)',
-                      background: draft.feel === n ? 'var(--accent)' : 'var(--surface2)',
-                      color: draft.feel === n ? '#000' : 'var(--text2)',
-                      fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 12, cursor: 'pointer',
-                    }}>{n}</button>
+                    <button
+                      key={n}
+                      onClick={() => updateDraftField('feel', n)}
+                      className="h-[30px] w-[30px] cursor-pointer rounded border text-xs font-bold"
+                      style={{
+                        fontFamily: 'var(--font-display)',
+                        borderColor: draft.feel === n ? 'var(--accent)' : 'var(--border)',
+                        background: draft.feel === n ? 'var(--accent)' : 'var(--surface2)',
+                        color: draft.feel === n ? '#000' : 'var(--text2)',
+                      }}
+                    >{n}</button>
                   ))}
                 </div>
               </div>
@@ -107,7 +111,7 @@ export default function HistoryEntry({
             </>
           )}
         </div>
-        <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start', flexShrink: 0 }}>
+        <div className="flex flex-shrink-0 items-start gap-1.5">
           {!editing && w.feel && <span className={`feel-badge feel-${w.feel}`}>{FEEL_LABELS[w.feel] || w.feel}</span>}
           {editing ? (
             <>
@@ -124,26 +128,25 @@ export default function HistoryEntry({
       </div>
 
       {w.exercises.map((ex, ei) => (
-        <div key={ei} style={{ marginBottom: editing ? 12 : 4 }}>
+        <div key={ei} className={editing ? 'mb-3' : 'mb-1'}>
           {editing ? (
-            <div style={{ background: 'var(--surface3)', borderRadius: 6, padding: '10px 12px', border: '1px solid var(--border)' }}>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
+            <div className="rounded-md border px-3 py-2.5" style={{ background: 'var(--surface3)', borderColor: 'var(--border)' }}>
+              <div className="mb-2 flex items-center gap-2">
                 <input
-                  className="inp"
+                  className="inp text-[13px] font-semibold"
                   value={ex.name}
                   onChange={e => updateDraftExName(ei, e.target.value)}
-                  style={{ fontWeight: 600, fontSize: 13 }}
                 />
-                <button className="btn-rm" style={{ color: 'var(--red)', fontSize: 16, flexShrink: 0 }} onClick={() => removeDraftExercise(ei)}>✕</button>
+                <button className="btn-rm flex-shrink-0 text-base" style={{ color: 'var(--red)' }} onClick={() => removeDraftExercise(ei)}>✕</button>
               </div>
-              <table className="ex-table" style={{ width: '100%' }}>
+              <table className="ex-table w-full">
                 <thead>
                   <tr>
-                    <th style={{ width: 24 }}>#</th>
+                    <th className="w-6">#</th>
                     <th>Weight (lbs)</th>
                     <th>Reps</th>
                     <th>RIR</th>
-                    <th style={{ width: 24 }}></th>
+                    <th className="w-6"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -167,10 +170,10 @@ export default function HistoryEntry({
           ) : (
             <div className="history-ex">
               <strong style={{ color: 'var(--text)' }}>{ex.name}</strong>
-              {ex.priority && <span className="ex-tag priority" style={{ marginLeft: 6 }}>Priority</span>}
+              {ex.priority && <span className="ex-tag priority ml-1.5">Priority</span>}
               <div className="history-sets">
                 {ex.sets.map((s, j) => (
-                  <span key={j} style={{ marginRight: 8, color: s.type === 'drop' ? '#f59e0b' : s.type === 'restpause' ? '#a78bfa' : 'inherit' }}>
+                  <span key={j} className="mr-2" style={{ color: s.type === 'drop' ? '#f59e0b' : s.type === 'restpause' ? '#a78bfa' : 'inherit' }}>
                     {s.weight ? `${s.weight}lb × ` : ''}{s.reps}{s.pauseReps ? `+${s.pauseReps}` : ''}r {s.rir !== undefined ? `RIR${s.rir}` : ''}
                     {s.type === 'drop' && (s.drops?.length ?? 0) > 0 && ` → ${s.drops!.map(d => `${d.weight}×${d.reps}`).join(' → ')}`}
                     {s.type === 'restpause' && ' [RP]'}
@@ -185,14 +188,13 @@ export default function HistoryEntry({
 
       {editing && draft ? (
         <textarea
-          className="inp"
+          className="inp mt-2 min-h-14"
           value={draft.notes || ''}
           onChange={e => updateDraftField('notes', e.target.value)}
           placeholder="Session notes..."
-          style={{ marginTop: 8, minHeight: 56 }}
         />
       ) : (
-        w.notes && <div style={{ marginTop: 8, fontSize: 13, color: 'var(--text3)', fontStyle: 'italic' }}>&quot;{w.notes}&quot;</div>
+        w.notes && <div className="mt-2 text-[13px] italic" style={{ color: 'var(--text3)' }}>&quot;{w.notes}&quot;</div>
       )}
     </div>
   )

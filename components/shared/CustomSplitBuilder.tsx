@@ -39,11 +39,11 @@ function BuilderExerciseRow({
   onUpdate: (idx: number, field: keyof BuilderExercise, val: string) => void
 }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 0', borderBottom: '1px solid var(--border)' }}>
-      <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 13, color: 'var(--text)', fontWeight: 600 }}>{ex.name}</div>
+    <div className="flex items-center gap-1.5 border-b py-[5px]" style={{ borderColor: 'var(--border)' }}>
+      <div className="flex-1">
+        <div className="text-[13px] font-semibold" style={{ color: 'var(--text)' }}>{ex.name}</div>
         <input
-          className="inp" style={{ marginTop: 4, fontSize: 11, padding: '3px 6px' }}
+          className="inp mt-1 px-1.5 py-[3px] text-[11px]"
           placeholder="Rep range e.g. 8-12"
           value={ex.repRange || ''}
           onChange={e => onUpdate(idx, 'repRange', e.target.value)}
@@ -70,24 +70,30 @@ function BuilderExercisePicker({
 
   return (
     <div>
-      <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
-        <input className="inp" style={{ flex: 1 }} placeholder="Search or type new..." value={search} onChange={e => setSearch(e.target.value)} />
+      <div className="mb-2 flex gap-1.5">
+        <input className="inp flex-1" placeholder="Search or type new..." value={search} onChange={e => setSearch(e.target.value)} />
         <button className="btn btn-secondary btn-sm" onClick={onClose}>Cancel</button>
       </div>
       {isNew && (
         <div
-          style={{ padding: '7px 10px', borderRadius: 5, background: '#050f00', border: '1px solid var(--accent)', marginBottom: 6, cursor: 'pointer' }}
+          className="mb-1.5 cursor-pointer rounded-[5px] border px-2.5 py-[7px]"
+          style={{ background: '#050f00', borderColor: 'var(--accent)' }}
           onClick={() => onSelect({ name: search.trim(), muscles: ['chest'], repRange: '10-12', custom: true })}
         >
-          <span style={{ fontSize: 10, fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--accent)', letterSpacing: 1 }}>+ ADD: </span>
-          <span style={{ fontSize: 13, color: 'var(--text)' }}>{search.trim()}</span>
+          <span className="text-[10px] font-bold tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--accent)' }}>+ ADD: </span>
+          <span className="text-[13px]" style={{ color: 'var(--text)' }}>{search.trim()}</span>
         </div>
       )}
-      <div style={{ maxHeight: 200, overflowY: 'auto', display: 'grid', gap: 2 }}>
+      <div className="grid max-h-[200px] gap-0.5 overflow-y-auto">
         {filtered.map((ex, i) => (
-          <div key={i} onClick={() => onSelect(ex)} style={{ padding: '6px 8px', borderRadius: 4, cursor: 'pointer', background: 'var(--surface)', fontSize: 13 }}>
-            <span style={{ fontWeight: 600, color: 'var(--text)' }}>{ex.name}</span>
-            <span style={{ fontSize: 11, color: 'var(--text3)', marginLeft: 6 }}>{ex.muscles.join(', ')} · {ex.repRange}</span>
+          <div
+            key={i}
+            onClick={() => onSelect(ex)}
+            className="cursor-pointer rounded px-2 py-1.5 text-[13px]"
+            style={{ background: 'var(--surface)' }}
+          >
+            <span className="font-semibold" style={{ color: 'var(--text)' }}>{ex.name}</span>
+            <span className="ml-1.5 text-[11px]" style={{ color: 'var(--text3)' }}>{ex.muscles.join(', ')} · {ex.repRange}</span>
           </div>
         ))}
       </div>
@@ -120,15 +126,15 @@ function BuilderDayCard({
   const isRest = day.name === 'Rest'
 
   return (
-    <div style={{ border: '1px solid var(--border)', borderRadius: 6, padding: 12, background: 'var(--surface)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+    <div className="rounded-md border p-3" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
+      <div className="mb-2.5 flex items-center gap-2">
         <input
-          className="inp" style={{ flex: 1, fontWeight: 600 }}
+          className="inp flex-1 font-semibold"
           placeholder="Day name e.g. Back & Rear Delts"
           value={day.name}
           onChange={e => onNameChange(dayIdx, e.target.value)}
         />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <div className="flex flex-col gap-0.5">
           <button className="btn-move" disabled={dayIdx === 0} onClick={() => onMove(dayIdx, -1)}>▲</button>
           <button className="btn-move" disabled={dayIdx === totalDays - 1} onClick={() => onMove(dayIdx, 1)}>▼</button>
         </div>
@@ -136,7 +142,7 @@ function BuilderDayCard({
       </div>
 
       {!isRest && (
-        <div style={{ marginBottom: 8 }}>
+        <div className="mb-2">
           {day.exercises.map((ex, ei) => (
             <BuilderExerciseRow
               key={ei} ex={ex} idx={ei}
@@ -148,11 +154,11 @@ function BuilderDayCard({
       )}
 
       {!isRest && !showPicker && (
-        <button className="btn btn-secondary btn-sm" style={{ fontSize: 11, marginTop: 4 }} onClick={() => setShowPicker(true)}>+ Add Exercise</button>
+        <button className="btn btn-secondary btn-sm mt-1 text-[11px]" onClick={() => setShowPicker(true)}>+ Add Exercise</button>
       )}
 
       {!isRest && showPicker && (
-        <div style={{ marginTop: 8, background: 'var(--surface2)', borderRadius: 5, padding: 10 }}>
+        <div className="mt-2 rounded-[5px] p-2.5" style={{ background: 'var(--surface2)' }}>
           <BuilderExercisePicker
             onSelect={ex => { onAddExercise(dayIdx, ex); setShowPicker(false) }}
             onClose={() => setShowPicker(false)}
@@ -238,17 +244,17 @@ export default function CustomSplitBuilder({
   }
 
   return (
-    <div style={{ display: 'grid', gap: 12 }}>
-      <div style={{ fontSize: 12, color: 'var(--text3)', lineHeight: 1.6 }}>
+    <div className="grid gap-3">
+      <div className="text-xs leading-[1.6]" style={{ color: 'var(--text3)' }}>
         Define your split day by day. Each day gets a name and a list of exercises. Add a Rest day wherever it falls in your rotation.
       </div>
 
       <div>
-        <div className="macro-lbl" style={{ marginBottom: 6 }}>Program Name</div>
+        <div className="macro-lbl mb-1.5">Program Name</div>
         <input className="inp" placeholder="e.g. Modified PPL — 4 Day Rotation" value={name} onChange={e => onNameChange(e.target.value)} />
       </div>
 
-      <div style={{ display: 'grid', gap: 8 }}>
+      <div className="grid gap-2">
         {days.map((day, idx) => (
           <BuilderDayCard
             key={idx}
@@ -263,7 +269,7 @@ export default function CustomSplitBuilder({
         ))}
       </div>
 
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      <div className="flex flex-wrap gap-2">
         <button className="btn btn-secondary btn-sm" onClick={addDay}>+ Training Day</button>
         <button className="btn btn-secondary btn-sm" onClick={addRestDay} style={{ color: 'var(--text3)' }}>+ Rest Day</button>
       </div>

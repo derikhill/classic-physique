@@ -59,12 +59,12 @@ export default function History({
       ))}
 
       {olderByMonth.size > 0 && recent.length > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '6px 0 2px' }}>
-          <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-          <span style={{ fontSize: 10, fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 2, color: 'var(--text3)', textTransform: 'uppercase' }}>
+        <div className="mt-1.5 mb-0.5 flex items-center gap-2.5">
+          <div className="h-px flex-1" style={{ background: 'var(--border)' }} />
+          <span className="text-[10px] font-bold uppercase tracking-[2px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--text3)' }}>
             Older Sessions
           </span>
-          <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+          <div className="h-px flex-1" style={{ background: 'var(--border)' }} />
         </div>
       )}
 
@@ -74,25 +74,22 @@ export default function History({
           <div key={key} className="card">
             <button
               onClick={() => toggleMonth(key)}
-              style={{
-                all: 'unset', cursor: 'pointer', width: '100%',
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              }}
+              className="flex w-full cursor-pointer items-center justify-between border-0 bg-transparent p-0 text-inherit"
               aria-expanded={isOpen}
             >
-              <div className="card-title" style={{ marginBottom: 0 }}>
+              <div className="card-title mb-0">
                 {MONTH_LABEL(key)}
-                <span style={{ marginLeft: 8, fontSize: 11, fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 1, color: 'var(--text3)' }}>
+                <span className="ml-2 text-[11px] font-bold tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--text3)' }}>
                   {sessions.length} {sessions.length === 1 ? 'session' : 'sessions'}
                 </span>
               </div>
-              <span style={{ fontSize: 12, color: 'var(--text3)', fontFamily: 'var(--font-display)', letterSpacing: 1 }}>
+              <span className="text-xs tracking-[1px]" style={{ color: 'var(--text3)', fontFamily: 'var(--font-display)' }}>
                 {isOpen ? '▾' : '▸'}
               </span>
             </button>
 
             {isOpen && (
-              <div style={{ marginTop: 12, display: 'grid', gap: 12 }}>
+              <div className="mt-3 grid gap-3">
                 {sessions.map(w => (
                   <HistoryEntry key={w.id} workout={w} onDelete={onDelete} onUpdate={onUpdate} />
                 ))}

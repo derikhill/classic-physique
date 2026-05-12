@@ -151,32 +151,32 @@ export default function BodyTracker({
       <div className="card">
         <div className="card-title">Daily Check-In</div>
 
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 11, fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 1, color: 'var(--accent2)', textTransform: 'uppercase', marginBottom: 8 }}>Today&apos;s Body</div>
-          <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+        <div className="mb-4">
+          <div className="mb-2 text-[11px] font-bold uppercase tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--accent2)' }}>Today&apos;s Body</div>
+          <div className="flex flex-wrap items-end gap-2.5">
             <div>
-              <div className="macro-lbl" style={{ marginBottom: 4 }}>Date</div>
-              <input type="date" className="inp" style={{ width: 150 }} value={date} onChange={e => setDate(e.target.value)} />
+              <div className="macro-lbl mb-1">Date</div>
+              <input type="date" className="inp w-[150px]" value={date} onChange={e => setDate(e.target.value)} />
             </div>
             <div>
-              <div className="macro-lbl" style={{ marginBottom: 4 }}>Weight (lbs)</div>
-              <input className="inp inp-sm" style={{ width: 90 }} placeholder="e.g. 185.5" value={weight} onChange={e => setWeight(e.target.value)} />
+              <div className="macro-lbl mb-1">Weight (lbs)</div>
+              <input className="inp inp-sm w-[90px]" placeholder="e.g. 185.5" value={weight} onChange={e => setWeight(e.target.value)} />
             </div>
             <div>
-              <div className="macro-lbl" style={{ marginBottom: 4 }}>Body Fat %</div>
-              <input className="inp inp-sm" style={{ width: 90 }} placeholder="e.g. 16.5" value={bf} onChange={e => setBf(e.target.value)} />
+              <div className="macro-lbl mb-1">Body Fat %</div>
+              <input className="inp inp-sm w-[90px]" placeholder="e.g. 16.5" value={bf} onChange={e => setBf(e.target.value)} />
             </div>
           </div>
         </div>
 
-        <div style={{ borderTop: '1px solid var(--border)', marginBottom: 16 }} />
+        <div className="mb-4 border-t" style={{ borderColor: 'var(--border)' }} />
 
-        <div style={{ marginBottom: 14 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8, flexWrap: 'wrap' }}>
-            <div style={{ fontSize: 11, fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 1, color: '#42c8f5', textTransform: 'uppercase' }}>Yesterday&apos;s Macros</div>
-            <input type="date" className="inp" style={{ width: 150 }} value={macroDate} onChange={e => setMacroDate(e.target.value)} />
+        <div className="mb-3.5">
+          <div className="mb-2 flex flex-wrap items-center gap-2.5">
+            <div className="text-[11px] font-bold uppercase tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: '#42c8f5' }}>Yesterday&apos;s Macros</div>
+            <input type="date" className="inp w-[150px]" value={macroDate} onChange={e => setMacroDate(e.target.value)} />
           </div>
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <div className="flex flex-wrap gap-2.5">
             {[
               { label: 'kcal',        val: calories, set: setCalories, placeholder: 'e.g. 2400' },
               { label: 'protein (g)', val: protein,  set: setProtein,  placeholder: 'e.g. 190' },
@@ -184,12 +184,12 @@ export default function BodyTracker({
               { label: 'fat (g)',     val: fat,      set: setFat,      placeholder: 'e.g. 70' },
             ].map(({ label, val, set, placeholder }) => (
               <div key={label}>
-                <div className="macro-lbl" style={{ marginBottom: 4 }}>{label}</div>
-                <input className="inp inp-sm" style={{ width: 86 }} placeholder={placeholder} value={val} onChange={e => set(e.target.value)} />
+                <div className="macro-lbl mb-1">{label}</div>
+                <input className="inp inp-sm w-[86px]" placeholder={placeholder} value={val} onChange={e => set(e.target.value)} />
               </div>
             ))}
           </div>
-          <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 6 }}>
+          <div className="mt-1.5 text-[11px]" style={{ color: 'var(--text3)' }}>
             Defaults to yesterday — adjust date if logging for a different day.
           </div>
         </div>
@@ -202,21 +202,20 @@ export default function BodyTracker({
       </div>
 
       <div className="card" style={{ borderColor: hasTargets ? '#42c8f5' : 'var(--border)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: hasTargets && !editingTargets ? 12 : 0 }}>
-          <div className="card-title" style={{ marginBottom: 0, color: hasTargets ? '#42c8f5' : 'var(--text2)' }}>Daily Targets</div>
+        <div className={`flex items-center justify-between ${hasTargets && !editingTargets ? 'mb-3' : ''}`}>
+          <div className="card-title mb-0" style={{ color: hasTargets ? '#42c8f5' : 'var(--text2)' }}>Daily Targets</div>
           <button
-            className="btn btn-secondary btn-sm"
-            style={{ fontSize: 11 }}
+            className="btn btn-secondary btn-sm text-[11px]"
             onClick={() => { setTargetDraft(macroTargets); setEditingTargets(e => !e) }}
           >{editingTargets ? 'Cancel' : hasTargets ? 'Edit' : 'Set Targets'}</button>
         </div>
 
         {editingTargets && (
-          <div style={{ marginTop: 12 }}>
-            <div style={{ fontSize: 12, color: 'var(--text3)', marginBottom: 10, lineHeight: 1.5 }}>
+          <div className="mt-3">
+            <div className="mb-2.5 text-xs leading-normal" style={{ color: 'var(--text3)' }}>
               Paste your targets from your Google Sheet. These stay fixed until you update them — adjust when your cut progresses and targets change.
             </div>
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 12 }}>
+            <div className="mb-3 flex flex-wrap gap-2.5">
               {[
                 { label: 'kcal',        key: 'calories' as const, placeholder: 'e.g. 2200' },
                 { label: 'protein (g)', key: 'protein' as const,  placeholder: 'e.g. 185' },
@@ -224,9 +223,9 @@ export default function BodyTracker({
                 { label: 'fat (g)',     key: 'fat' as const,      placeholder: 'e.g. 65' },
               ].map(({ label, key, placeholder }) => (
                 <div key={key}>
-                  <div className="macro-lbl" style={{ marginBottom: 4 }}>{label}</div>
+                  <div className="macro-lbl mb-1">{label}</div>
                   <input
-                    className="inp inp-sm" style={{ width: 90 }}
+                    className="inp inp-sm w-[90px]"
                     placeholder={placeholder}
                     value={targetDraft[key] || ''}
                     onChange={e => setTargetDraft(d => ({ ...d, [key]: e.target.value }))}
@@ -248,7 +247,7 @@ export default function BodyTracker({
             { label: 'Fat',      key: 'fat' as const,      unit: 'g',    color: '#c084fc' },
           ]
           return (
-            <div style={{ display: 'grid', gap: 8 }}>
+            <div className="grid gap-2">
               {fields.filter(f => macroTargets[f.key]).map(f => {
                 const target = parseFloat(macroTargets[f.key]!)
                 const actualVal = actuals ? parseFloat(actuals[f.key] || '0') : null
@@ -258,38 +257,36 @@ export default function BodyTracker({
                 const over = pct !== null && pct > 110
                 return (
                   <div key={f.key}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
-                      <span style={{ fontSize: 12, color: 'var(--text2)', fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase' }}>{f.label}</span>
-                      <div style={{ display: 'flex', gap: 8, alignItems: 'baseline' }}>
+                    <div className="mb-1 flex items-baseline justify-between">
+                      <span className="text-xs font-bold uppercase tracking-[1px]" style={{ color: 'var(--text2)', fontFamily: 'var(--font-display)' }}>{f.label}</span>
+                      <div className="flex items-baseline gap-2">
                         {actualVal !== null ? (
                           <>
-                            <span style={{ fontSize: 13, fontWeight: 600, color: onTrack ? f.color : over ? 'var(--red)' : 'var(--text2)' }}>
+                            <span className="text-[13px] font-semibold" style={{ color: onTrack ? f.color : over ? 'var(--red)' : 'var(--text2)' }}>
                               {actualVal}{f.unit}
                             </span>
-                            <span style={{ fontSize: 11, color: 'var(--text3)' }}>/ {target}{f.unit}</span>
-                            <span style={{ fontSize: 11, fontFamily: 'var(--font-display)', fontWeight: 700, color: onTrack ? 'var(--accent)' : over ? 'var(--red)' : 'var(--accent2)' }}>
+                            <span className="text-[11px]" style={{ color: 'var(--text3)' }}>/ {target}{f.unit}</span>
+                            <span className="text-[11px] font-bold" style={{ fontFamily: 'var(--font-display)', color: onTrack ? 'var(--accent)' : over ? 'var(--red)' : 'var(--accent2)' }}>
                               {diff! > 0 ? '+' : ''}{Math.round(diff!)}{f.unit}
                             </span>
                           </>
                         ) : (
-                          <span style={{ fontSize: 12, color: 'var(--text3)' }}>Target: {target}{f.unit} — not logged yet</span>
+                          <span className="text-xs" style={{ color: 'var(--text3)' }}>Target: {target}{f.unit} — not logged yet</span>
                         )}
                       </div>
                     </div>
-                    <div style={{ height: 5, background: 'var(--surface3)', borderRadius: 3, overflow: 'hidden' }}>
+                    <div className="h-[5px] overflow-hidden rounded-[3px]" style={{ background: 'var(--surface3)' }}>
                       {actualVal !== null && (
-                        <div style={{
-                          height: '100%', borderRadius: 3,
+                        <div className="h-full rounded-[3px] transition-[width] duration-[400ms] ease-out" style={{
                           width: `${Math.min(pct!, 120)}%`,
                           background: onTrack ? f.color : over ? 'var(--red)' : 'var(--accent2)',
-                          transition: 'width 0.4s ease',
                         }} />
                       )}
                     </div>
                   </div>
                 )
               })}
-              <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 4 }}>
+              <div className="mt-1 text-[11px]" style={{ color: 'var(--text3)' }}>
                 Showing actuals for {fmtDate(macroDate)} — change the macro date in check-in to compare any day.
               </div>
             </div>
@@ -297,7 +294,7 @@ export default function BodyTracker({
         })()}
 
         {!hasTargets && !editingTargets && (
-          <div style={{ fontSize: 13, color: 'var(--text3)', marginTop: 10 }}>
+          <div className="mt-2.5 text-[13px]" style={{ color: 'var(--text3)' }}>
             Set your daily targets from your Google Sheet and the app will track actuals vs targets each day you log macros.
           </div>
         )}
@@ -305,28 +302,30 @@ export default function BodyTracker({
 
       {currentGoal && (
         <div className="card" style={{ borderColor: 'var(--accent)', background: '#050f00' }}>
-          <div className="card-title" style={{ color: 'var(--accent)', marginBottom: 8 }}>🎯 Goal Progress</div>
+          <div className="card-title mb-2" style={{ color: 'var(--accent)' }}>🎯 Goal Progress</div>
 
           {phase === 'cut' && currentGoal.mode === 'rate' && rateOfChange !== null && (
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                <span style={{ fontSize: 13, color: 'var(--text2)' }}>Current rate</span>
-                <span style={{ fontSize: 14, fontFamily: 'var(--font-display)', fontWeight: 700,
-                  color: Math.abs(parseFloat(rateOfChange)) >= parseFloat(currentGoal.targetRate!) * 0.85 ? 'var(--accent)' : 'var(--red)' }}>
+              <div className="mb-1.5 flex justify-between">
+                <span className="text-[13px]" style={{ color: 'var(--text2)' }}>Current rate</span>
+                <span className="text-sm font-bold" style={{
+                  fontFamily: 'var(--font-display)',
+                  color: Math.abs(parseFloat(rateOfChange)) >= parseFloat(currentGoal.targetRate!) * 0.85 ? 'var(--accent)' : 'var(--red)',
+                }}>
                   {parseFloat(rateOfChange) > 0 ? '+' : ''}{rateOfChange} lbs/wk
                 </span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                <span style={{ fontSize: 13, color: 'var(--text2)' }}>Target rate</span>
-                <span style={{ fontSize: 13, color: 'var(--text3)' }}>{currentGoal.targetRate} lbs/wk</span>
+              <div className="mb-2 flex justify-between">
+                <span className="text-[13px]" style={{ color: 'var(--text2)' }}>Target rate</span>
+                <span className="text-[13px]" style={{ color: 'var(--text3)' }}>{currentGoal.targetRate} lbs/wk</span>
               </div>
-              <div style={{ height: 6, background: 'var(--surface3)', borderRadius: 3, overflow: 'hidden' }}>
-                <div style={{ height: '100%', borderRadius: 3, transition: 'width 0.4s ease',
+              <div className="h-1.5 overflow-hidden rounded-[3px]" style={{ background: 'var(--surface3)' }}>
+                <div className="h-full rounded-[3px] transition-[width] duration-[400ms] ease-out" style={{
                   width: `${Math.min(Math.abs(parseFloat(rateOfChange)) / parseFloat(currentGoal.targetRate!) * 100, 100)}%`,
                   background: Math.abs(parseFloat(rateOfChange)) >= parseFloat(currentGoal.targetRate!) * 0.85 ? 'var(--accent)' : 'var(--red)',
                 }} />
               </div>
-              <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 6 }}>
+              <div className="mt-1.5 text-[11px]" style={{ color: 'var(--text3)' }}>
                 {Math.abs(parseFloat(rateOfChange)) < parseFloat(currentGoal.targetRate!) * 0.85
                   ? `⚠ ${(parseFloat(currentGoal.targetRate!) - Math.abs(parseFloat(rateOfChange))).toFixed(2)} lbs/wk below target — tighten the deficit`
                   : '✓ On pace with your target rate'}
@@ -335,45 +334,47 @@ export default function BodyTracker({
           )}
 
           {phase === 'cut' && currentGoal.mode === 'deadline' && (
-            <div style={{ display: 'grid', gap: 6 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 13, color: 'var(--text2)' }}>Goal weight</span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent)' }}>{currentGoal.targetWeight} lbs by {currentGoal.deadline}</span>
+            <div className="grid gap-1.5">
+              <div className="flex justify-between">
+                <span className="text-[13px]" style={{ color: 'var(--text2)' }}>Goal weight</span>
+                <span className="text-[13px] font-bold" style={{ color: 'var(--accent)' }}>{currentGoal.targetWeight} lbs by {currentGoal.deadline}</span>
               </div>
-              {requiredRate && <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 13, color: 'var(--text2)' }}>Required rate</span>
-                <span style={{ fontSize: 13, fontFamily: 'var(--font-display)', fontWeight: 700,
-                  color: parseFloat(requiredRate.rate) > 2 ? 'var(--red)' : 'var(--accent)' }}>
+              {requiredRate && <div className="flex justify-between">
+                <span className="text-[13px]" style={{ color: 'var(--text2)' }}>Required rate</span>
+                <span className="text-[13px] font-bold" style={{
+                  fontFamily: 'var(--font-display)',
+                  color: parseFloat(requiredRate.rate) > 2 ? 'var(--red)' : 'var(--accent)',
+                }}>
                   {requiredRate.rate} lbs/wk ({requiredRate.daysLeft} days left)
                 </span>
               </div>}
-              {rateOfChange !== null && requiredRate && <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 13, color: 'var(--text2)' }}>Current rate</span>
-                <span style={{ fontSize: 13, color: Math.abs(parseFloat(rateOfChange)) >= parseFloat(requiredRate.rate) * 0.85 ? 'var(--accent)' : 'var(--accent2)' }}>
+              {rateOfChange !== null && requiredRate && <div className="flex justify-between">
+                <span className="text-[13px]" style={{ color: 'var(--text2)' }}>Current rate</span>
+                <span className="text-[13px]" style={{ color: Math.abs(parseFloat(rateOfChange)) >= parseFloat(requiredRate.rate) * 0.85 ? 'var(--accent)' : 'var(--accent2)' }}>
                   {rateOfChange} lbs/wk
                 </span>
               </div>}
               {requiredRate && parseFloat(requiredRate.rate) > 2 && (
-                <div style={{ fontSize: 11, color: 'var(--red)', marginTop: 4 }}>⚠ Required rate is aggressive — consider extending deadline or adjusting goal weight</div>
+                <div className="mt-1 text-[11px]" style={{ color: 'var(--red)' }}>⚠ Required rate is aggressive — consider extending deadline or adjusting goal weight</div>
               )}
             </div>
           )}
 
           {phase === 'build' && currentGoal.mode === 'priority' && (currentGoal.muscles?.length ?? 0) > 0 && (
-            <div style={{ display: 'grid', gap: 6 }}>
-              <div style={{ fontSize: 12, color: 'var(--text3)', marginBottom: 4 }}>14-day volume — priority muscles</div>
+            <div className="grid gap-1.5">
+              <div className="mb-1 text-xs" style={{ color: 'var(--text3)' }}>14-day volume — priority muscles</div>
               {currentGoal.muscles!.map(m => {
                 const vol = muscleVolume(workouts, 14)[m] || 0
                 const allVols = Object.values(muscleVolume(workouts, 14)).filter(v => v > 0)
                 const max = allVols.length ? Math.max(...allVols) : 1
                 return (
                   <div key={m}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                      <span style={{ fontSize: 12, textTransform: 'capitalize', color: 'var(--text2)' }}>{m.replace('_', ' ')}</span>
-                      <span style={{ fontSize: 12, fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--accent)' }}>{vol} sets</span>
+                    <div className="mb-[3px] flex justify-between">
+                      <span className="text-xs capitalize" style={{ color: 'var(--text2)' }}>{m.replace('_', ' ')}</span>
+                      <span className="text-xs font-bold" style={{ fontFamily: 'var(--font-display)', color: 'var(--accent)' }}>{vol} sets</span>
                     </div>
-                    <div style={{ height: 5, background: 'var(--surface3)', borderRadius: 3, overflow: 'hidden' }}>
-                      <div style={{ height: '100%', borderRadius: 3, width: `${(vol / max) * 100}%`, background: 'var(--accent)' }} />
+                    <div className="h-[5px] overflow-hidden rounded-[3px]" style={{ background: 'var(--surface3)' }}>
+                      <div className="h-full rounded-[3px]" style={{ width: `${(vol / max) * 100}%`, background: 'var(--accent)' }} />
                     </div>
                   </div>
                 )
@@ -382,10 +383,10 @@ export default function BodyTracker({
           )}
 
           {phase === 'build' && currentGoal.mode === 'strength' && (
-            <div style={{ display: 'grid', gap: 6 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 13, color: 'var(--text2)' }}>{currentGoal.lift}</span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent)' }}>→ {currentGoal.targetWeight}lbs × {currentGoal.targetReps}</span>
+            <div className="grid gap-1.5">
+              <div className="flex justify-between">
+                <span className="text-[13px]" style={{ color: 'var(--text2)' }}>{currentGoal.lift}</span>
+                <span className="text-[13px] font-bold" style={{ color: 'var(--accent)' }}>→ {currentGoal.targetWeight}lbs × {currentGoal.targetReps}</span>
               </div>
               {(() => {
                 const recentWorkouts = [...workouts].sort((a, b) => b.date.localeCompare(a.date))
@@ -394,25 +395,25 @@ export default function BodyTracker({
                   if (ex?.sets?.length) {
                     const best = ex.sets.filter(s => s.weight && s.reps).sort((a, b) => parseFloat(b.weight!) - parseFloat(a.weight!))[0]
                     if (best) return (
-                      <div style={{ fontSize: 12, color: 'var(--text3)' }}>
+                      <div className="text-xs" style={{ color: 'var(--text3)' }}>
                         Last logged: <span style={{ color: 'var(--text2)' }}>{best.weight}lbs × {best.reps} ({w.date})</span>
                       </div>
                     )
                   }
                 }
-                return <div style={{ fontSize: 12, color: 'var(--text3)' }}>No matching sessions logged yet</div>
+                return <div className="text-xs" style={{ color: 'var(--text3)' }}>No matching sessions logged yet</div>
               })()}
             </div>
           )}
 
           {currentGoal.note && (
-            <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 8, fontStyle: 'italic' }}>{currentGoal.note}</div>
+            <div className="mt-2 text-[11px] italic" style={{ color: 'var(--text3)' }}>{currentGoal.note}</div>
           )}
         </div>
       )}
 
       {bodyEntries.filter(e => e.weight).length >= 2 && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+        <div className="card p-0 grid grid-cols-1 gap-2.5">
           <BodyMiniChart entries={bodyEntries} field="weight" color="var(--accent2)" label="Bodyweight" unit="lbs" />
           {bodyEntries.filter(e => e.bf).length >= 2 && (
             <BodyMiniChart entries={bodyEntries} field="bf" color="#42c8f5" label="Body Fat" unit="%" />
@@ -423,24 +424,28 @@ export default function BodyTracker({
       {weeklyAvgs.length >= 2 && (
         <div className="card">
           <div className="card-title">Weekly Averages</div>
-          <div style={{ display: 'grid', gap: 6, marginBottom: 10 }}>
+          <div className="mb-2.5 grid gap-1.5">
             {weeklyAvgs.map((w, i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: '1px solid var(--border)' }}>
-                <span style={{ fontSize: 13, color: 'var(--text2)' }}>{w.label}</span>
-                <span style={{ fontSize: 13, fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--accent2)' }}>{w.avg} lbs <span style={{ color: 'var(--text3)', fontWeight: 400, fontSize: 11 }}>({w.count} days)</span></span>
+              <div key={i} className="flex justify-between border-b py-[5px]" style={{ borderColor: 'var(--border)' }}>
+                <span className="text-[13px]" style={{ color: 'var(--text2)' }}>{w.label}</span>
+                <span className="text-[13px] font-bold" style={{ fontFamily: 'var(--font-display)', color: 'var(--accent2)' }}>
+                  {w.avg} lbs <span className="text-[11px] font-normal" style={{ color: 'var(--text3)' }}>({w.count} days)</span>
+                </span>
               </div>
             ))}
           </div>
           {rateOfChange !== null && (
-            <div style={{
-              padding: '8px 12px', borderRadius: 5,
+            <div className="rounded-[5px] border px-3 py-2" style={{
               background: Math.abs(parseFloat(rateOfChange)) < 0.1 ? 'var(--surface3)' : parseFloat(rateOfChange) < 0 ? '#0a1400' : '#1a0a00',
-              border: `1px solid ${Math.abs(parseFloat(rateOfChange)) < 0.1 ? 'var(--border)' : parseFloat(rateOfChange) < 0 ? 'var(--accent)' : 'var(--red)'}`,
+              borderColor: Math.abs(parseFloat(rateOfChange)) < 0.1 ? 'var(--border)' : parseFloat(rateOfChange) < 0 ? 'var(--accent)' : 'var(--red)',
             }}>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, letterSpacing: 1, color: parseFloat(rateOfChange) < 0 ? 'var(--accent)' : parseFloat(rateOfChange) > 0 ? 'var(--red)' : 'var(--text3)' }}>
+              <span className="text-[11px] font-bold uppercase tracking-[1px]" style={{
+                fontFamily: 'var(--font-display)',
+                color: parseFloat(rateOfChange) < 0 ? 'var(--accent)' : parseFloat(rateOfChange) > 0 ? 'var(--red)' : 'var(--text3)',
+              }}>
                 RATE: {parseFloat(rateOfChange) > 0 ? '+' : ''}{rateOfChange} lbs/week
               </span>
-              <span style={{ fontSize: 12, color: 'var(--text3)', marginLeft: 10 }}>
+              <span className="ml-2.5 text-xs" style={{ color: 'var(--text3)' }}>
                 {phase === 'cut'
                   ? Math.abs(parseFloat(rateOfChange)) >= 0.5 && Math.abs(parseFloat(rateOfChange)) <= 2
                     ? '✓ On target for cut (0.5-2lbs/week)'
@@ -463,7 +468,7 @@ export default function BodyTracker({
       {sorted.length > 0 && (
         <div className="card">
           <div className="card-title">Log</div>
-          <table className="ex-table" style={{ width: '100%' }}>
+          <table className="ex-table w-full">
             <thead>
               <tr>
                 <th>Date</th>
@@ -479,12 +484,12 @@ export default function BodyTracker({
                 const lbm = e.weight && e.bf ? (parseFloat(e.weight) * (1 - parseFloat(e.bf) / 100)).toFixed(1) : '—'
                 return (
                   <tr key={i}>
-                    <td style={{ fontSize: 12, color: 'var(--text2)' }}>{fmtDate(e.date)}</td>
-                    <td style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{e.weight ? `${e.weight} lbs` : '—'}</td>
-                    <td style={{ fontSize: 13, color: 'var(--text2)' }}>{e.bf ? `${e.bf}%` : '—'}</td>
-                    <td style={{ fontSize: 12, color: 'var(--accent)' }}>{lbm !== '—' ? `${lbm} lbs` : '—'}</td>
-                    <td style={{ fontSize: 12, color: 'var(--text2)' }}>{e.macros?.calories ? `${e.macros.calories}` : '—'}</td>
-                    <td style={{ fontSize: 12, color: '#42c8f5' }}>{e.macros?.protein ? `${e.macros.protein}g` : '—'}</td>
+                    <td className="text-xs" style={{ color: 'var(--text2)' }}>{fmtDate(e.date)}</td>
+                    <td className="text-[13px] font-semibold" style={{ color: 'var(--text)' }}>{e.weight ? `${e.weight} lbs` : '—'}</td>
+                    <td className="text-[13px]" style={{ color: 'var(--text2)' }}>{e.bf ? `${e.bf}%` : '—'}</td>
+                    <td className="text-xs" style={{ color: 'var(--accent)' }}>{lbm !== '—' ? `${lbm} lbs` : '—'}</td>
+                    <td className="text-xs" style={{ color: 'var(--text2)' }}>{e.macros?.calories ? `${e.macros.calories}` : '—'}</td>
+                    <td className="text-xs" style={{ color: '#42c8f5' }}>{e.macros?.protein ? `${e.macros.protein}g` : '—'}</td>
                   </tr>
                 )
               })}

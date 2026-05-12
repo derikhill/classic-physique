@@ -76,46 +76,54 @@ export default function ExercisePickerModal({
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
         <div className="modal-body">
-          <div style={{ position: 'relative', marginBottom: 12 }}>
+          <div className="relative mb-3">
             <input
               ref={searchRef}
-              className="inp"
+              className="inp pl-8"
               placeholder="Search exercises or type a new one..."
               value={search}
               onChange={e => setSearch(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && isNewCustom && handleAddCustom()}
-              style={{ paddingLeft: 32 }}
             />
-            <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text3)', fontSize: 14 }}>🔍</span>
-            {search && <button onClick={() => setSearch('')} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text3)', cursor: 'pointer', fontSize: 16 }}>×</button>}
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-sm" style={{ color: 'var(--text3)' }}>🔍</span>
+            {search && (
+              <button
+                onClick={() => setSearch('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer border-0 bg-transparent text-base"
+                style={{ color: 'var(--text3)' }}
+              >×</button>
+            )}
           </div>
 
           {isNewCustom && (
-            <div style={{ background: '#050f00', border: '1px solid var(--accent)', borderRadius: 6, padding: '12px 14px', marginBottom: 12 }}>
-              <div style={{ fontSize: 12, color: 'var(--accent)', fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 1, marginBottom: 10 }}>✦ NEW EXERCISE: {search.trim()}</div>
-              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
+            <div className="mb-3 rounded-md border px-3.5 py-3" style={{ background: '#050f00', borderColor: 'var(--accent)' }}>
+              <div className="mb-2.5 text-xs font-bold tracking-[1px]" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>✦ NEW EXERCISE: {search.trim()}</div>
+              <div className="mb-2.5 flex flex-wrap gap-2.5">
                 <div>
-                  <div className="macro-lbl" style={{ marginBottom: 4 }}>Rep range</div>
-                  <input className="inp inp-sm" style={{ width: 90 }} value={customReps} onChange={e => setCustomReps(e.target.value)} placeholder="e.g. 10-12" />
+                  <div className="macro-lbl mb-1">Rep range</div>
+                  <input className="inp inp-sm w-[90px]" value={customReps} onChange={e => setCustomReps(e.target.value)} placeholder="e.g. 10-12" />
                 </div>
                 {!isSwap && (
                   <div>
-                    <div className="macro-lbl" style={{ marginBottom: 4 }}>Muscle group</div>
-                    <select className="inp" style={{ width: 130 }} value={customMuscle} onChange={e => setCustomMuscle(e.target.value as MuscleKey)}>
+                    <div className="macro-lbl mb-1">Muscle group</div>
+                    <select className="inp w-[130px]" value={customMuscle} onChange={e => setCustomMuscle(e.target.value as MuscleKey)}>
                       {Object.entries(MUSCLES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                     </select>
                   </div>
                 )}
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                <div onClick={() => setSaveToLibrary(s => !s)} style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
-                  <div style={{
-                    width: 16, height: 16, borderRadius: 3, border: `1px solid ${saveToLibrary ? 'var(--accent)' : 'var(--border)'}`,
-                    background: saveToLibrary ? 'var(--accent)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    {saveToLibrary && <span style={{ color: '#000', fontSize: 11, fontWeight: 900 }}>✓</span>}
+              <div className="mb-2.5 flex items-center gap-2.5">
+                <div onClick={() => setSaveToLibrary(s => !s)} className="flex cursor-pointer items-center gap-1.5">
+                  <div
+                    className="flex h-4 w-4 items-center justify-center rounded-[3px] border"
+                    style={{
+                      borderColor: saveToLibrary ? 'var(--accent)' : 'var(--border)',
+                      background: saveToLibrary ? 'var(--accent)' : 'transparent',
+                    }}
+                  >
+                    {saveToLibrary && <span className="text-[11px] font-black" style={{ color: '#000' }}>✓</span>}
                   </div>
-                  <span style={{ fontSize: 12, color: 'var(--text2)' }}>Save to my exercise library</span>
+                  <span className="text-xs" style={{ color: 'var(--text2)' }}>Save to my exercise library</span>
                 </div>
               </div>
               <button className="btn btn-primary btn-sm" onClick={handleAddCustom}>
@@ -125,10 +133,10 @@ export default function ExercisePickerModal({
           )}
 
           {!isNewCustom && (
-            <div style={{ fontSize: 11, color: 'var(--text3)', marginBottom: 8 }}>
+            <div className="mb-2 text-[11px]" style={{ color: 'var(--text3)' }}>
               {q ? `${filtered.length} result${filtered.length !== 1 ? 's' : ''}` : `${filtered.length} exercises`}
               {!isSwap && !q && (customExercises?.length ?? 0) > 0 && (
-                <span style={{ marginLeft: 6, color: 'var(--accent)' }}>· {customExercises!.length} saved</span>
+                <span className="ml-1.5" style={{ color: 'var(--accent)' }}>· {customExercises!.length} saved</span>
               )}
             </div>
           )}
@@ -138,14 +146,14 @@ export default function ExercisePickerModal({
               <div>
                 <div className="swap-option-name">
                   {ex.name}
-                  {ex.custom && <span className="ex-tag" style={{ background: '#1a0050', color: '#a78bfa', marginLeft: 6, fontSize: 10 }}>SAVED</span>}
-                  {ex.priority && <span className="ex-tag priority" style={{ marginLeft: 4 }}>Priority</span>}
+                  {ex.custom && <span className="ex-tag ml-1.5 text-[10px]" style={{ background: '#1a0050', color: '#a78bfa' }}>SAVED</span>}
+                  {ex.priority && <span className="ex-tag priority ml-1">Priority</span>}
                 </div>
                 <div className="swap-option-meta">
                   {ex.muscles.map(m => MUSCLES[m]?.label).filter(Boolean).join(', ')} · {ex.repRange} reps{ex.note && ex.note !== 'Custom exercise' ? ` · ${ex.note}` : ''}
                 </div>
               </div>
-              <span style={{ fontSize: 11, color: 'var(--accent)', fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 1 }}>SELECT →</span>
+              <span className="text-[11px] font-bold tracking-[1px]" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>SELECT →</span>
             </div>
           ))}
         </div>

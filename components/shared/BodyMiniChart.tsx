@@ -30,22 +30,28 @@ export default function BodyMiniChart({
   const prev = vals[vals.length - 2]
   const delta = latest - prev
   return (
-    <div style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 6, padding: '10px 12px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+    <div className="rounded-md border px-3 py-2.5" style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>
+      <div className="mb-2 flex items-start justify-between">
         <div>
-          <div style={{ fontSize: 11, fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 1, color: 'var(--text3)', textTransform: 'uppercase' }}>{label}</div>
-          <div style={{ fontSize: 22, fontFamily: 'var(--font-display)', fontWeight: 900, color, lineHeight: 1.1, marginTop: 2 }}>
+          <div className="text-[11px] font-bold uppercase tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--text3)' }}>{label}</div>
+          <div className="mt-0.5 text-[22px] font-black leading-[1.1]" style={{ fontFamily: 'var(--font-display)', color }}>
             {latest.toFixed(1)}{unit}
           </div>
         </div>
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: 12, color: delta < 0 ? 'var(--accent)' : delta > 0 ? 'var(--red)' : 'var(--text3)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>
+        <div className="text-right">
+          <div
+            className="font-bold"
+            style={{
+              fontFamily: 'var(--font-display)',
+              color: delta < 0 ? 'var(--accent)' : delta > 0 ? 'var(--red)' : 'var(--text3)',
+            }}
+          >
             {delta > 0 ? '+' : ''}{delta.toFixed(1)}{unit} last entry
           </div>
-          <div style={{ fontSize: 11, color: 'var(--text3)' }}>{data.length} entries</div>
+          <div className="text-[11px]" style={{ color: 'var(--text3)' }}>{data.length} entries</div>
         </div>
       </div>
-      <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: 'block' }}>
+      <svg width="100%" viewBox={`0 0 ${W} ${H}`} className="block">
         <polyline points={pts.join(' ')} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
         <circle cx={parseFloat(pts[pts.length - 1].split(',')[0])} cy={parseFloat(pts[pts.length - 1].split(',')[1])} r="3" fill={color} />
       </svg>

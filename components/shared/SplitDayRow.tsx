@@ -11,12 +11,12 @@ export default function SplitDayRow({
 }) {
   const isRest = day === 'Rest'
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 0', borderBottom: '1px solid var(--border)' }}>
-      <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: isRest ? 'var(--text3)' : 'var(--text)' }}>{day}</div>
-        <div style={{ fontSize: 10, color: 'var(--text3)', fontFamily: 'var(--font-display)', letterSpacing: 1, textTransform: 'uppercase', marginTop: 1 }}>Day {index + 1}</div>
+    <div className="flex items-center gap-2 border-b py-[7px]" style={{ borderColor: 'var(--border)' }}>
+      <div className="flex-1">
+        <div className="text-[13px] font-semibold" style={{ color: isRest ? 'var(--text3)' : 'var(--text)' }}>{day}</div>
+        <div className="mt-px text-[10px] uppercase tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--text3)' }}>Day {index + 1}</div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <div className="flex flex-col gap-0.5">
         <button className="btn-move" disabled={index === 0} onClick={() => onMove(index, -1)}>▲</button>
         <button className="btn-move" disabled={index === total - 1} onClick={() => onMove(index, 1)}>▼</button>
       </div>

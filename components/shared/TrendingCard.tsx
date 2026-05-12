@@ -20,84 +20,77 @@ export default function TrendingCard({ workouts }: { workouts: Workout[] }) {
     })
 
   return (
-    <div className="card" style={{ borderColor: 'var(--accent)', background: '#050f00', marginBottom: 16 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <div className="card-title" style={{ marginBottom: 0, color: 'var(--accent)' }}>🔥 Trending Lifts</div>
-        <span style={{ fontSize: 11, color: 'var(--text3)', fontFamily: 'var(--font-display)', letterSpacing: 1 }}>VOLUME · LAST 6 SESSIONS</span>
+    <div className="card mb-4" style={{ borderColor: 'var(--accent)', background: '#050f00' }}>
+      <div className="mb-3 flex items-center justify-between">
+        <div className="card-title mb-0" style={{ color: 'var(--accent)' }}>🔥 Trending Lifts</div>
+        <span className="text-[11px] tracking-[1px]" style={{ color: 'var(--text3)', fontFamily: 'var(--font-display)' }}>VOLUME · LAST 6 SESSIONS</span>
       </div>
-      <div style={{ display: 'grid', gap: 8 }}>
+      <div className="grid gap-2">
         {trends.map((t, i) => {
           const isOpen = expanded.has(t.name)
           return (
-            <div key={i} style={{
-              background: 'var(--surface2)', borderRadius: 6,
-              border: `1px solid ${isOpen ? 'var(--accent)' : 'var(--border)'}`,
+            <div key={i} className="rounded-md border" style={{
+              background: 'var(--surface2)',
+              borderColor: isOpen ? 'var(--accent)' : 'var(--border)',
             }}>
               <button
                 onClick={() => toggle(t.name)}
                 aria-expanded={isOpen}
-                style={{
-                  all: 'unset', cursor: 'pointer', width: '100%',
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '10px 12px', gap: 12, boxSizing: 'border-box',
-                }}
+                className="box-border flex w-full cursor-pointer items-center justify-between gap-3 border-0 bg-transparent px-3 py-2.5 text-inherit"
               >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)' }}>{t.name}</span>
-                    <span style={{
-                      fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700,
-                      letterSpacing: 1, color: '#000', background: 'var(--accent)',
-                      padding: '1px 7px', borderRadius: 3,
-                    }}>↑ {t.streak} IN A ROW</span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-sm font-semibold" style={{ color: 'var(--text)' }}>{t.name}</span>
+                    <span
+                      className="rounded-[3px] px-[7px] py-px text-[11px] font-bold tracking-[1px]"
+                      style={{ fontFamily: 'var(--font-display)', color: '#000', background: 'var(--accent)' }}
+                    >↑ {t.streak} IN A ROW</span>
                   </div>
-                  <div style={{ display: 'flex', gap: 12, marginTop: 4, flexWrap: 'wrap' }}>
+                  <div className="mt-1 flex flex-wrap gap-3">
                     {t.weightGain > 0.5 && (
-                      <span style={{ fontSize: 12, color: 'var(--accent)' }}>+{Math.round(t.weightGain)}lbs avg weight this run</span>
+                      <span className="text-xs" style={{ color: 'var(--accent)' }}>+{Math.round(t.weightGain)}lbs avg weight this run</span>
                     )}
-                    <span style={{ fontSize: 12, color: 'var(--text3)' }}>
+                    <span className="text-xs" style={{ color: 'var(--text3)' }}>
                       {t.volChange >= 0 ? '+' : ''}{Math.round(t.volChange)} vol last session
                     </span>
                   </div>
                 </div>
-                <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div className="flex flex-shrink-0 items-center gap-2">
                   <Sparkline data={t.sparkData} />
-                  <span style={{ fontSize: 12, color: 'var(--text3)', fontFamily: 'var(--font-display)', letterSpacing: 1 }}>
+                  <span className="text-xs tracking-[1px]" style={{ color: 'var(--text3)', fontFamily: 'var(--font-display)' }}>
                     {isOpen ? '▾' : '▸'}
                   </span>
                 </div>
               </button>
 
               {isOpen && (
-                <div style={{ padding: '0 12px 12px', borderTop: '1px solid var(--border)' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto', gap: '4px 12px', alignItems: 'baseline', marginTop: 10 }}>
-                    <span style={{ fontSize: 10, fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 1, color: 'var(--text3)', textTransform: 'uppercase' }}>Date</span>
-                    <span style={{ fontSize: 10, fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 1, color: 'var(--text3)', textTransform: 'uppercase', textAlign: 'right' }}>Avg Wt</span>
-                    <span style={{ fontSize: 10, fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 1, color: 'var(--text3)', textTransform: 'uppercase', textAlign: 'right' }}>Avg Reps</span>
-                    <span style={{ fontSize: 10, fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 1, color: 'var(--text3)', textTransform: 'uppercase', textAlign: 'right' }}>Volume</span>
+                <div className="border-t px-3 pb-3" style={{ borderColor: 'var(--border)' }}>
+                  <div className="mt-2.5 grid grid-cols-[1fr_auto_auto_auto] items-baseline gap-x-3 gap-y-1">
+                    <span className="text-[10px] font-bold uppercase tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--text3)' }}>Date</span>
+                    <span className="text-right text-[10px] font-bold uppercase tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--text3)' }}>Avg Wt</span>
+                    <span className="text-right text-[10px] font-bold uppercase tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--text3)' }}>Avg Reps</span>
+                    <span className="text-right text-[10px] font-bold uppercase tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--text3)' }}>Volume</span>
                     {t.history.slice().reverse().map((h, hi) => {
                       const isLatest = hi === 0
+                      const cellClass = `pt-1 text-xs ${isLatest ? 'font-semibold' : 'font-normal'} ${hi === 0 ? '' : 'border-t'}`
                       const cellStyle = {
-                        fontSize: 12,
                         color: isLatest ? 'var(--accent)' : 'var(--text2)',
-                        fontWeight: isLatest ? 600 : 400,
-                        paddingTop: 4,
-                        borderTop: hi === 0 ? 'none' : '1px solid var(--border)',
+                        ...(hi !== 0 ? { borderColor: 'var(--border)' } : {}),
                       } as const
                       return (
                         <Fragment key={`${h.date}-${hi}`}>
-                          <span style={cellStyle}>
-                            {fmtDate(h.date)} <span style={{ color: 'var(--text3)', fontSize: 11 }}>· {h.setCount}×</span>
+                          <span className={cellClass} style={cellStyle}>
+                            {fmtDate(h.date)} <span className="text-[11px]" style={{ color: 'var(--text3)' }}>· {h.setCount}×</span>
                           </span>
-                          <span style={{ ...cellStyle, textAlign: 'right' }}>{Math.round(h.avgWeight)}lbs</span>
-                          <span style={{ ...cellStyle, textAlign: 'right' }}>{h.avgReps.toFixed(1)}</span>
-                          <span style={{ ...cellStyle, textAlign: 'right' }}>{Math.round(h.volume)}</span>
+                          <span className={`${cellClass} text-right`} style={cellStyle}>{Math.round(h.avgWeight)}lbs</span>
+                          <span className={`${cellClass} text-right`} style={cellStyle}>{h.avgReps.toFixed(1)}</span>
+                          <span className={`${cellClass} text-right`} style={cellStyle}>{Math.round(h.volume)}</span>
                         </Fragment>
                       )
                     })}
                   </div>
                   {t.sessions > t.history.length && (
-                    <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 8, fontStyle: 'italic' }}>
+                    <div className="mt-2 text-[10px] italic" style={{ color: 'var(--text3)' }}>
                       Showing last {t.history.length} of {t.sessions} sessions.
                     </div>
                   )}

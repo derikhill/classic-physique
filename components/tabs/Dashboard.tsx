@@ -86,10 +86,10 @@ export default function Dashboard({
         <div className="card">
           <div className="card-title">Recent Sessions</div>
           {recent.slice(0, 3).map(w => (
-            <div key={w.id} style={{ marginBottom: 10, paddingBottom: 10, borderBottom: '1px solid var(--border)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: 1 }}>{w.splitDay}</span>
-                <span style={{ fontSize: 12, color: 'var(--text3)' }}>{fmtDate(w.date)} · {totalSets(w)} sets</span>
+            <div key={w.id} className="mb-2.5 border-b pb-2.5" style={{ borderColor: 'var(--border)' }}>
+              <div className="flex items-center justify-between">
+                <span className="font-bold uppercase tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--accent)' }}>{w.splitDay}</span>
+                <span className="text-xs" style={{ color: 'var(--text3)' }}>{fmtDate(w.date)} · {totalSets(w)} sets</span>
               </div>
             </div>
           ))}
@@ -100,7 +100,7 @@ export default function Dashboard({
         <div className="empty">
           <div className="empty-icon">💪</div>
           <div className="empty-text">No sessions logged yet</div>
-          <div style={{ marginTop: 16 }}>
+          <div className="mt-4">
             <button className="btn btn-primary" onClick={() => onNavigate('log')}>Log First Workout</button>
           </div>
         </div>

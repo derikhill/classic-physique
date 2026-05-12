@@ -4,6 +4,7 @@ import { useState } from 'react'
 import {
   PHASES,
   RECOVERY_REASONS,
+  SPLIT,
   SPLIT_ORDER,
   type ExerciseTemplate,
   type PhaseId,
@@ -11,6 +12,7 @@ import {
 import { callClaudeJSON, fmtDate, muscleVolume, type RecoveryContext, type Workout } from '@/lib/utils'
 import { analyzeProgramSwitch, type ProgramSwitchAnalysis } from '@/lib/progression'
 import CustomSplitBuilder, { type CoachSplit } from '@/components/shared/CustomSplitBuilder'
+import ProgramEditor from '@/components/shared/ProgramEditor'
 import SplitDayRow from '@/components/shared/SplitDayRow'
 
 interface PhaseGoal {
@@ -57,10 +59,13 @@ export default function Settings({
   phaseGoals,
   onPhaseGoals,
   customExercises,
+  onSaveCustomExercise,
   onDeleteCustomExercise,
   splitOrder,
   onSplitOrder,
   activeCoachSplit,
+  onUpdateCoachSplit,
+  currentProgramName,
 }: {
   phase: PhaseId
   onPhaseChange: (p: PhaseId) => void
@@ -72,10 +77,13 @@ export default function Settings({
   phaseGoals: Record<string, PhaseGoal>
   onPhaseGoals: (goals: Record<string, PhaseGoal>) => void
   customExercises: ExerciseTemplate[]
+  onSaveCustomExercise: (ex: ExerciseTemplate) => void
   onDeleteCustomExercise: (name: string) => void
   splitOrder: string[] | null
   onSplitOrder: (order: string[] | null) => void
   activeCoachSplit: CoachSplit | null
+  onUpdateCoachSplit: (split: CoachSplit) => void
+  currentProgramName: string
 }) {
   const [switchStep, setSwitchStep] = useState<null | 'result' | 'deload_offer' | 'coach_generating' | 'coach_review' | 'name_new' | 'build'>(null)
   const [builderDays, setBuilderDays] = useState<BuilderDay[]>([])
@@ -208,6 +216,30 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
     }
   }
 
+  const buildSplitFromDefault = (): CoachSplit => {
+    const order = splitOrder || SPLIT_ORDER
+    return {
+      name: currentProgramName,
+      source: 'cloned-default',
+      days: order.map(label => {
+        const sd = SPLIT[label]
+        return {
+          label,
+          focus: '',
+          note: sd?.note || '',
+          exercises: (sd?.exercises || []).map(ex => ({
+            name: ex.name,
+            muscles: ex.muscles,
+            repRange: ex.repRange,
+            sets: ex.sets || 3,
+            priority: ex.priority || false,
+            note: ex.note,
+          })),
+        }
+      }),
+    }
+  }
+
   const acceptCoachSplit = () => {
     if (!coachSplit) return
     const name = coachSplit.name || newProgramName || 'Coach-Generated Split'
@@ -233,55 +265,60 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
       </div>
 
       <div className="card" style={{ borderColor: editingGoals ? 'var(--accent)' : currentGoal ? 'var(--accent)' : 'var(--border)', background: currentGoal && !editingGoals ? '#050f00' : 'var(--surface)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: editingGoals || currentGoal ? 12 : 0 }}>
-          <div className="card-title" style={{ marginBottom: 0, color: currentGoal ? 'var(--accent)' : 'var(--text2)' }}>
+        <div className={`flex items-center justify-between ${editingGoals || currentGoal ? 'mb-3' : ''}`}>
+          <div className="card-title mb-0" style={{ color: currentGoal ? 'var(--accent)' : 'var(--text2)' }}>
             {phase === 'cut' ? '🎯 Cut Goal' : phase === 'build' ? '🎯 Build Goal' : phase === 'maintenance' ? '🎯 Maintenance Goal' : '🎯 Recovery Goal'}
           </div>
-          <div style={{ display: 'flex', gap: 6 }}>
-            {currentGoal && !editingGoals && <button className="btn btn-secondary btn-sm" style={{ fontSize: 11 }} onClick={openGoals}>Edit</button>}
-            {!currentGoal && !editingGoals && <button className="btn btn-secondary btn-sm" style={{ fontSize: 11 }} onClick={openGoals}>Set Goal</button>}
-            {editingGoals && <button className="btn btn-secondary btn-sm" style={{ fontSize: 11 }} onClick={() => setEditingGoals(false)}>Cancel</button>}
+          <div className="flex gap-1.5">
+            {currentGoal && !editingGoals && <button className="btn btn-secondary btn-sm text-[11px]" onClick={openGoals}>Edit</button>}
+            {!currentGoal && !editingGoals && <button className="btn btn-secondary btn-sm text-[11px]" onClick={openGoals}>Set Goal</button>}
+            {editingGoals && <button className="btn btn-secondary btn-sm text-[11px]" onClick={() => setEditingGoals(false)}>Cancel</button>}
           </div>
         </div>
 
         {currentGoal && !editingGoals && (() => {
           const g = currentGoal
           if (phase === 'cut') return (
-            <div style={{ display: 'grid', gap: 6 }}>
-              {g.mode === 'rate' && <div style={{ fontSize: 13, color: 'var(--text2)' }}>Target rate: <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{g.targetRate} lbs/week</span></div>}
+            <div className="grid gap-1.5">
+              {g.mode === 'rate' && <div className="text-[13px]" style={{ color: 'var(--text2)' }}>Target rate: <span className="font-bold" style={{ color: 'var(--accent)' }}>{g.targetRate} lbs/week</span></div>}
               {g.mode === 'deadline' && <>
-                <div style={{ fontSize: 13, color: 'var(--text2)' }}>Goal weight: <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{g.targetWeight} lbs</span></div>
-                <div style={{ fontSize: 13, color: 'var(--text2)' }}>Deadline: <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{g.deadline}</span></div>
+                <div className="text-[13px]" style={{ color: 'var(--text2)' }}>Goal weight: <span className="font-bold" style={{ color: 'var(--accent)' }}>{g.targetWeight} lbs</span></div>
+                <div className="text-[13px]" style={{ color: 'var(--text2)' }}>Deadline: <span className="font-bold" style={{ color: 'var(--accent)' }}>{g.deadline}</span></div>
               </>}
-              {g.note && <div style={{ fontSize: 12, color: 'var(--text3)', fontStyle: 'italic' }}>{g.note}</div>}
-              <button className="btn btn-secondary btn-sm" style={{ fontSize: 11, marginTop: 4, color: 'var(--red)', borderColor: 'var(--red)', alignSelf: 'flex-start' }} onClick={clearGoals}>Clear Goal</button>
+              {g.note && <div className="text-xs italic" style={{ color: 'var(--text3)' }}>{g.note}</div>}
+              <button className="btn btn-secondary btn-sm mt-1 self-start text-[11px]" style={{ color: 'var(--red)', borderColor: 'var(--red)' }} onClick={clearGoals}>Clear Goal</button>
             </div>
           )
           if (phase === 'build') return (
-            <div style={{ display: 'grid', gap: 6 }}>
-              {g.mode === 'overall' && <div style={{ fontSize: 13, color: 'var(--text2)' }}>Mode: <span style={{ color: 'var(--accent)', fontWeight: 700 }}>Overall growth</span></div>}
-              {g.mode === 'priority' && <div style={{ fontSize: 13, color: 'var(--text2)' }}>Priority: <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{(g.muscles || []).map(m => m.replace('_', ' ')).join(', ')}</span></div>}
-              {g.mode === 'strength' && <div style={{ fontSize: 13, color: 'var(--text2)' }}>Strength goal: <span style={{ color: 'var(--accent)', fontWeight: 700 }}>{g.lift} — {g.targetWeight}lbs × {g.targetReps} reps</span></div>}
-              {g.note && <div style={{ fontSize: 12, color: 'var(--text3)', fontStyle: 'italic' }}>{g.note}</div>}
-              <button className="btn btn-secondary btn-sm" style={{ fontSize: 11, marginTop: 4, color: 'var(--red)', borderColor: 'var(--red)', alignSelf: 'flex-start' }} onClick={clearGoals}>Clear Goal</button>
+            <div className="grid gap-1.5">
+              {g.mode === 'overall' && <div className="text-[13px]" style={{ color: 'var(--text2)' }}>Mode: <span className="font-bold" style={{ color: 'var(--accent)' }}>Overall growth</span></div>}
+              {g.mode === 'priority' && <div className="text-[13px]" style={{ color: 'var(--text2)' }}>Priority: <span className="font-bold" style={{ color: 'var(--accent)' }}>{(g.muscles || []).map(m => m.replace('_', ' ')).join(', ')}</span></div>}
+              {g.mode === 'strength' && <div className="text-[13px]" style={{ color: 'var(--text2)' }}>Strength goal: <span className="font-bold" style={{ color: 'var(--accent)' }}>{g.lift} — {g.targetWeight}lbs × {g.targetReps} reps</span></div>}
+              {g.note && <div className="text-xs italic" style={{ color: 'var(--text3)' }}>{g.note}</div>}
+              <button className="btn btn-secondary btn-sm mt-1 self-start text-[11px]" style={{ color: 'var(--red)', borderColor: 'var(--red)' }} onClick={clearGoals}>Clear Goal</button>
             </div>
           )
-          return <div style={{ fontSize: 13, color: 'var(--text3)' }}>Goal set.</div>
+          return <div className="text-[13px]" style={{ color: 'var(--text3)' }}>Goal set.</div>
         })()}
 
         {editingGoals && (
           <div>
             {phase === 'cut' && (
-              <div style={{ display: 'grid', gap: 14 }}>
+              <div className="grid gap-3.5">
                 <div>
-                  <div className="macro-lbl" style={{ marginBottom: 8 }}>Mode</div>
-                  <div style={{ display: 'flex', gap: 8 }}>
+                  <div className="macro-lbl mb-2">Mode</div>
+                  <div className="flex gap-2">
                     {[{ id: 'rate', label: 'Rate of loss' }, { id: 'deadline', label: 'Deadline + target weight' }].map(m => (
-                      <div key={m.id} onClick={() => setGoalDraft(d => ({ ...d, mode: m.id }))}
-                        style={{ padding: '8px 14px', borderRadius: 5, cursor: 'pointer', fontSize: 13,
-                          border: `1px solid ${goalDraft.mode === m.id ? 'var(--accent)' : 'var(--border)'}`,
+                      <div
+                        key={m.id}
+                        onClick={() => setGoalDraft(d => ({ ...d, mode: m.id }))}
+                        className="cursor-pointer rounded-[5px] border px-3.5 py-2 text-[13px]"
+                        style={{
+                          borderColor: goalDraft.mode === m.id ? 'var(--accent)' : 'var(--border)',
                           background: goalDraft.mode === m.id ? '#0a1400' : 'var(--surface2)',
-                          color: goalDraft.mode === m.id ? 'var(--accent)' : 'var(--text2)' }}>
+                          color: goalDraft.mode === m.id ? 'var(--accent)' : 'var(--text2)',
+                        }}
+                      >
                         {m.label}
                       </div>
                     ))}
@@ -290,30 +327,30 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
 
                 {goalDraft.mode === 'rate' && (
                   <div>
-                    <div className="macro-lbl" style={{ marginBottom: 6 }}>Target rate of loss (lbs/week)</div>
-                    <input className="inp inp-sm" style={{ width: 120 }} placeholder="e.g. 1.5"
+                    <div className="macro-lbl mb-1.5">Target rate of loss (lbs/week)</div>
+                    <input className="inp inp-sm w-[120px]" placeholder="e.g. 1.5"
                       value={goalDraft.targetRate || ''} onChange={e => setGoalDraft(d => ({ ...d, targetRate: e.target.value }))} />
-                    <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 4 }}>0.5–1% of bodyweight/week is the natural range. Above 1% risks muscle loss.</div>
+                    <div className="mt-1 text-[11px]" style={{ color: 'var(--text3)' }}>0.5–1% of bodyweight/week is the natural range. Above 1% risks muscle loss.</div>
                   </div>
                 )}
 
                 {goalDraft.mode === 'deadline' && (
-                  <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                  <div className="flex flex-wrap gap-3">
                     <div>
-                      <div className="macro-lbl" style={{ marginBottom: 6 }}>Goal weight (lbs)</div>
-                      <input className="inp inp-sm" style={{ width: 110 }} placeholder="e.g. 175"
+                      <div className="macro-lbl mb-1.5">Goal weight (lbs)</div>
+                      <input className="inp inp-sm w-[110px]" placeholder="e.g. 175"
                         value={goalDraft.targetWeight || ''} onChange={e => setGoalDraft(d => ({ ...d, targetWeight: e.target.value }))} />
                     </div>
                     <div>
-                      <div className="macro-lbl" style={{ marginBottom: 6 }}>Deadline</div>
-                      <input type="date" className="inp" style={{ width: 160 }}
+                      <div className="macro-lbl mb-1.5">Deadline</div>
+                      <input type="date" className="inp w-[160px]"
                         value={goalDraft.deadline || ''} onChange={e => setGoalDraft(d => ({ ...d, deadline: e.target.value }))} />
                     </div>
                   </div>
                 )}
 
                 <div>
-                  <div className="macro-lbl" style={{ marginBottom: 6 }}>Notes (optional)</div>
+                  <div className="macro-lbl mb-1.5">Notes (optional)</div>
                   <input className="inp" placeholder="e.g. aggressive cut for summer, pool season deadline"
                     value={goalDraft.note || ''} onChange={e => setGoalDraft(d => ({ ...d, note: e.target.value }))} />
                 </div>
@@ -321,16 +358,21 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
             )}
 
             {phase === 'build' && (
-              <div style={{ display: 'grid', gap: 14 }}>
+              <div className="grid gap-3.5">
                 <div>
-                  <div className="macro-lbl" style={{ marginBottom: 8 }}>Mode</div>
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  <div className="macro-lbl mb-2">Mode</div>
+                  <div className="flex flex-wrap gap-2">
                     {[{ id: 'overall', label: 'Overall growth' }, { id: 'priority', label: 'Priority muscle(s)' }, { id: 'strength', label: 'Strength goal' }].map(m => (
-                      <div key={m.id} onClick={() => setGoalDraft(d => ({ ...d, mode: m.id, muscles: [], lift: '', targetWeight: '', targetReps: '' }))}
-                        style={{ padding: '8px 14px', borderRadius: 5, cursor: 'pointer', fontSize: 13,
-                          border: `1px solid ${goalDraft.mode === m.id ? 'var(--accent)' : 'var(--border)'}`,
+                      <div
+                        key={m.id}
+                        onClick={() => setGoalDraft(d => ({ ...d, mode: m.id, muscles: [], lift: '', targetWeight: '', targetReps: '' }))}
+                        className="cursor-pointer rounded-[5px] border px-3.5 py-2 text-[13px]"
+                        style={{
+                          borderColor: goalDraft.mode === m.id ? 'var(--accent)' : 'var(--border)',
                           background: goalDraft.mode === m.id ? '#0a1400' : 'var(--surface2)',
-                          color: goalDraft.mode === m.id ? 'var(--accent)' : 'var(--text2)' }}>
+                          color: goalDraft.mode === m.id ? 'var(--accent)' : 'var(--text2)',
+                        }}
+                      >
                         {m.label}
                       </div>
                     ))}
@@ -339,25 +381,28 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
 
                 {goalDraft.mode === 'priority' && (
                   <div>
-                    <div className="macro-lbl" style={{ marginBottom: 8 }}>Select priority muscles (up to 2)</div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    <div className="macro-lbl mb-2">Select priority muscles (up to 2)</div>
+                    <div className="flex flex-wrap gap-1.5">
                       {GOAL_MUSCLES.map(m => {
                         const selected = (goalDraft.muscles || []).includes(m)
                         const maxed = (goalDraft.muscles || []).length >= 2 && !selected
                         return (
-                          <div key={m} onClick={() => {
-                            if (maxed) return
-                            setGoalDraft(d => ({
-                              ...d,
-                              muscles: selected ? d.muscles!.filter(x => x !== m) : [...(d.muscles || []), m],
-                            }))
-                          }} style={{
-                            padding: '5px 12px', borderRadius: 4, cursor: maxed ? 'default' : 'pointer', fontSize: 12,
-                            border: `1px solid ${selected ? 'var(--accent)' : 'var(--border)'}`,
-                            background: selected ? '#0a1400' : 'var(--surface2)',
-                            color: selected ? 'var(--accent)' : maxed ? 'var(--text3)' : 'var(--text2)',
-                            textTransform: 'capitalize',
-                          }}>{m.replace('_', ' ')}</div>
+                          <div
+                            key={m}
+                            onClick={() => {
+                              if (maxed) return
+                              setGoalDraft(d => ({
+                                ...d,
+                                muscles: selected ? d.muscles!.filter(x => x !== m) : [...(d.muscles || []), m],
+                              }))
+                            }}
+                            className={`rounded border px-3 py-[5px] text-xs capitalize ${maxed ? 'cursor-default' : 'cursor-pointer'}`}
+                            style={{
+                              borderColor: selected ? 'var(--accent)' : 'var(--border)',
+                              background: selected ? '#0a1400' : 'var(--surface2)',
+                              color: selected ? 'var(--accent)' : maxed ? 'var(--text3)' : 'var(--text2)',
+                            }}
+                          >{m.replace('_', ' ')}</div>
                         )
                       })}
                     </div>
@@ -365,21 +410,21 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
                 )}
 
                 {goalDraft.mode === 'strength' && (
-                  <div style={{ display: 'grid', gap: 10 }}>
+                  <div className="grid gap-2.5">
                     <div>
-                      <div className="macro-lbl" style={{ marginBottom: 6 }}>Target lift</div>
+                      <div className="macro-lbl mb-1.5">Target lift</div>
                       <input className="inp" placeholder="e.g. Hack Squat, Incline DB Press"
                         value={goalDraft.lift || ''} onChange={e => setGoalDraft(d => ({ ...d, lift: e.target.value }))} />
                     </div>
-                    <div style={{ display: 'flex', gap: 12 }}>
+                    <div className="flex gap-3">
                       <div>
-                        <div className="macro-lbl" style={{ marginBottom: 6 }}>Target weight (lbs)</div>
-                        <input className="inp inp-sm" style={{ width: 110 }} placeholder="e.g. 315"
+                        <div className="macro-lbl mb-1.5">Target weight (lbs)</div>
+                        <input className="inp inp-sm w-[110px]" placeholder="e.g. 315"
                           value={goalDraft.targetWeight || ''} onChange={e => setGoalDraft(d => ({ ...d, targetWeight: e.target.value }))} />
                       </div>
                       <div>
-                        <div className="macro-lbl" style={{ marginBottom: 6 }}>Target reps</div>
-                        <input className="inp inp-sm" style={{ width: 90 }} placeholder="e.g. 8"
+                        <div className="macro-lbl mb-1.5">Target reps</div>
+                        <input className="inp inp-sm w-[90px]" placeholder="e.g. 8"
                           value={goalDraft.targetReps || ''} onChange={e => setGoalDraft(d => ({ ...d, targetReps: e.target.value }))} />
                       </div>
                     </div>
@@ -387,7 +432,7 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
                 )}
 
                 <div>
-                  <div className="macro-lbl" style={{ marginBottom: 6 }}>Notes (optional)</div>
+                  <div className="macro-lbl mb-1.5">Notes (optional)</div>
                   <input className="inp" placeholder="e.g. focus on back and arms this block"
                     value={goalDraft.note || ''} onChange={e => setGoalDraft(d => ({ ...d, note: e.target.value }))} />
                 </div>
@@ -396,13 +441,13 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
 
             {(phase === 'maintenance' || phase === 'recovery') && (
               <div>
-                <div className="macro-lbl" style={{ marginBottom: 6 }}>Goal note</div>
+                <div className="macro-lbl mb-1.5">Goal note</div>
                 <input className="inp" placeholder={phase === 'maintenance' ? 'e.g. establish baseline, nail consistency' : 'e.g. full elbow recovery, no time pressure'}
                   value={goalDraft.note || ''} onChange={e => setGoalDraft(d => ({ ...d, note: e.target.value }))} />
               </div>
             )}
 
-            <div className="btn-row" style={{ marginTop: 14 }}>
+            <div className="btn-row mt-3.5">
               <button className="btn btn-primary btn-sm"
                 disabled={phase === 'cut' ? !goalDraft.mode : phase === 'build' ? !goalDraft.mode : false}
                 onClick={saveGoals}>Save Goal</button>
@@ -412,7 +457,7 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
         )}
 
         {!currentGoal && !editingGoals && (
-          <div style={{ fontSize: 13, color: 'var(--text3)', marginTop: 8 }}>
+          <div className="mt-2 text-[13px]" style={{ color: 'var(--text3)' }}>
             {phase === 'cut' ? 'Set a rate target or deadline to track your cut against a specific goal.' : phase === 'build' ? 'Set a build focus — overall growth, a priority muscle, or a strength target.' : 'Optional — add a note for what this phase is working toward.'}
           </div>
         )}
@@ -429,13 +474,13 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
         }
         return (
           <div className="card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-              <div className="card-title" style={{ marginBottom: 0 }}>Split Order</div>
+            <div className="mb-1 flex items-center justify-between">
+              <div className="card-title mb-0">Split Order</div>
               {splitOrder && (
-                <button className="btn btn-secondary btn-sm" style={{ fontSize: 11 }} onClick={() => onSplitOrder(null)}>Reset</button>
+                <button className="btn btn-secondary btn-sm text-[11px]" onClick={() => onSplitOrder(null)}>Reset</button>
               )}
             </div>
-            <div style={{ fontSize: 12, color: 'var(--text3)', marginBottom: 10 }}>Drag the days into the order you train them. Reflected in the Log tab.</div>
+            <div className="mb-2.5 text-xs" style={{ color: 'var(--text3)' }}>Drag the days into the order you train them. Reflected in the Log tab.</div>
             {order.map((day, idx) => (
               <SplitDayRow key={day} day={day} index={idx} total={order.length} onMove={moveDay} />
             ))}
@@ -445,18 +490,18 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
 
       {recoveryContext?.active && (
         <div className="card" style={{ borderColor: 'var(--accent2)', background: '#1a0d00' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div className="flex items-start justify-between">
             <div>
-              <div className="card-title" style={{ marginBottom: 4, color: 'var(--accent2)' }}>
+              <div className="card-title mb-1" style={{ color: 'var(--accent2)' }}>
                 {RECOVERY_REASONS.find(r => r.id === recoveryContext.reason)?.icon || '⚡'} Recovery Mode Active
               </div>
-              <div style={{ fontSize: 13, color: 'var(--text2)' }}>
+              <div className="text-[13px]" style={{ color: 'var(--text2)' }}>
                 {RECOVERY_REASONS.find(r => r.id === recoveryContext.reason)?.label || recoveryContext.reason}
-                {recoveryContext.injuryDetail && <span style={{ color: 'var(--accent2)', marginLeft: 6 }}>— {recoveryContext.injuryDetail}</span>}
+                {recoveryContext.injuryDetail && <span className="ml-1.5" style={{ color: 'var(--accent2)' }}>— {recoveryContext.injuryDetail}</span>}
               </div>
-              <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 4 }}>Since {recoveryContext.startDate}</div>
+              <div className="mt-1 text-[11px]" style={{ color: 'var(--text3)' }}>Since {recoveryContext.startDate}</div>
             </div>
-            <button className="btn btn-secondary btn-sm" style={{ fontSize: 11 }} onClick={() => onRecoveryContext(null)}>
+            <button className="btn btn-secondary btn-sm text-[11px]" onClick={() => onRecoveryContext(null)}>
               Clear
             </button>
           </div>
@@ -466,34 +511,36 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
       {showRecoveryModal && (
         <div className="card" style={{ borderColor: 'var(--accent2)', background: '#1a0d00' }}>
           <div className="card-title" style={{ color: 'var(--accent2)' }}>What&apos;s driving this recovery phase?</div>
-          <div style={{ display: 'grid', gap: 8, marginBottom: 16 }}>
+          <div className="mb-4 grid gap-2">
             {RECOVERY_REASONS.map(r => (
               <div
                 key={r.id}
                 onClick={() => setRcReason(r.id)}
+                className="flex cursor-pointer items-center gap-2.5 rounded-md border px-3 py-2.5"
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  padding: '10px 12px', borderRadius: 6, cursor: 'pointer',
-                  border: `1px solid ${rcReason === r.id ? 'var(--accent2)' : 'var(--border)'}`,
+                  borderColor: rcReason === r.id ? 'var(--accent2)' : 'var(--border)',
                   background: rcReason === r.id ? '#2d1a00' : 'var(--surface2)',
                 }}
               >
-                <span style={{ fontSize: 18 }}>{r.icon}</span>
-                <span style={{ fontSize: 13, color: rcReason === r.id ? 'var(--accent2)' : 'var(--text2)', fontWeight: rcReason === r.id ? 600 : 400 }}>{r.label}</span>
+                <span className="text-lg">{r.icon}</span>
+                <span
+                  className={`text-[13px] ${rcReason === r.id ? 'font-semibold' : 'font-normal'}`}
+                  style={{ color: rcReason === r.id ? 'var(--accent2)' : 'var(--text2)' }}
+                >{r.label}</span>
               </div>
             ))}
           </div>
 
           {rcReason === 'injury' && (
-            <div style={{ marginBottom: 16 }}>
-              <div className="macro-lbl" style={{ marginBottom: 6 }}>What specifically? (used to flag exercises)</div>
+            <div className="mb-4">
+              <div className="macro-lbl mb-1.5">What specifically? (used to flag exercises)</div>
               <input
                 className="inp"
                 placeholder="e.g. left elbow, right knee, lower back..."
                 value={rcDetail}
                 onChange={e => setRcDetail(e.target.value)}
               />
-              <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 4 }}>
+              <div className="mt-1 text-[11px]" style={{ color: 'var(--text3)' }}>
                 The app will auto-flag exercises that may aggravate this area.
               </div>
             </div>
@@ -512,17 +559,17 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
 
       <div className="card">
         <div className="card-title">Your Profile</div>
-        <div style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.8 }}>
-          <div><strong style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)', letterSpacing: 1 }}>Goal:</strong> 80s/90s era classic physique — proportional, full muscle bellies</div>
-          <div><strong style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)', letterSpacing: 1 }}>Rep Range:</strong> 8-12 compounds · 12-20 isolation · 0-1 RIR</div>
-          <div><strong style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)', letterSpacing: 1 }}>Volume Target:</strong> 16-24 sets/muscle/week across both sessions</div>
-          <div><strong style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)', letterSpacing: 1 }}>Frequency:</strong> 2x/week per muscle group</div>
-          <div><strong style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)', letterSpacing: 1 }}>Priority:</strong> Back, Chest, Quads ★, Side Delts, Arms</div>
-          <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border)' }}>
-            <strong style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)', letterSpacing: 1 }}>
+        <div className="text-[13px] leading-loose" style={{ color: 'var(--text2)' }}>
+          <div><strong className="tracking-[1px]" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>Goal:</strong> 80s/90s era classic physique — proportional, full muscle bellies</div>
+          <div><strong className="tracking-[1px]" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>Rep Range:</strong> 8-12 compounds · 12-20 isolation · 0-1 RIR</div>
+          <div><strong className="tracking-[1px]" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>Volume Target:</strong> 16-24 sets/muscle/week across both sessions</div>
+          <div><strong className="tracking-[1px]" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>Frequency:</strong> 2x/week per muscle group</div>
+          <div><strong className="tracking-[1px]" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>Priority:</strong> Back, Chest, Quads ★, Side Delts, Arms</div>
+          <div className="mt-2 border-t pt-2" style={{ borderColor: 'var(--border)' }}>
+            <strong className="tracking-[1px]" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>
               Split:{activeCoachSplit ? ` ${activeCoachSplit.name}` : ''}
             </strong>
-            <div style={{ marginTop: 4, display: 'grid', gap: 3 }}>
+            <div className="mt-1 grid gap-[3px]">
               {(() => {
                 const items = activeCoachSplit
                   ? activeCoachSplit.days.map((d, i) => ({
@@ -539,22 +586,37 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
                       }
                     })
                 return items.map(({ day, label, detail }, i) => (
-                  <div key={`${day}-${i}`} style={{ display: 'flex', gap: 8, alignItems: 'baseline' }}>
-                    <span style={{ fontFamily: 'var(--font-display)', fontSize: 11, fontWeight: 700, color: 'var(--text3)', width: 28, letterSpacing: 1 }}>{day}</span>
-                    <span style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, color: label === 'Rest' ? 'var(--text3)' : 'var(--accent)' }}>{label}</span>
-                    {detail && <span style={{ fontSize: 12, color: 'var(--text3)' }}>{detail}</span>}
+                  <div key={`${day}-${i}`} className="flex items-baseline gap-2">
+                    <span className="w-7 text-[11px] font-bold tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--text3)' }}>{day}</span>
+                    <span className="text-[13px] font-bold" style={{ fontFamily: 'var(--font-display)', color: label === 'Rest' ? 'var(--text3)' : 'var(--accent)' }}>{label}</span>
+                    {detail && <span className="text-xs" style={{ color: 'var(--text3)' }}>{detail}</span>}
                   </div>
                 ))
               })()}
             </div>
           </div>
-          <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border)' }}>
-            <div style={{ fontSize: 12, color: 'var(--text3)', marginTop: 3, lineHeight: 1.6 }}>
+          <div className="mt-2 border-t pt-2" style={{ borderColor: 'var(--border)' }}>
+            <div className="mt-[3px] text-xs leading-[1.6]" style={{ color: 'var(--text3)' }}>
               {recoveryContext?.active && recoveryContext.injuryDetail ? `⚠ Active issue: ${recoveryContext.injuryDetail}` : 'No active injuries logged.'}
             </div>
           </div>
-          <div><strong style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)', letterSpacing: 1 }}>Rest:</strong> 1.5-2 min between sets (flexible)</div>
+          <div><strong className="tracking-[1px]" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>Rest:</strong> 1.5-2 min between sets (flexible)</div>
         </div>
+      </div>
+
+      <div className="card">
+        <div className="card-title">Current Program</div>
+        <ProgramEditor
+          split={activeCoachSplit || buildSplitFromDefault()}
+          onChange={onUpdateCoachSplit}
+          customExercises={customExercises}
+          onSaveCustomExercise={onSaveCustomExercise}
+        />
+        {!activeCoachSplit && (
+          <div className="mt-3 text-[11px] italic" style={{ color: 'var(--text3)' }}>
+            You&apos;re viewing the built-in split. Your first edit will save a personal copy you can keep tuning.
+          </div>
+        )}
       </div>
 
       <div className="card" style={{ borderColor: switchStep ? 'var(--accent2)' : 'var(--border)' }}>
@@ -562,10 +624,10 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
 
         {!switchStep && (
           <div>
-            <div style={{ fontSize: 13, color: 'var(--text2)', marginBottom: 12, lineHeight: 1.6 }}>
+            <div className="mb-3 text-[13px] leading-[1.6]" style={{ color: 'var(--text2)' }}>
               Thinking about switching programs? The app will analyse your last 6 weeks of data first and give you an honest read before anything changes.
             </div>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <div className="flex flex-wrap gap-2">
               <button className="btn btn-secondary" onClick={startSwitch} style={{ borderColor: 'var(--accent2)', color: 'var(--accent2)' }}>
                 ⚑ Request Program Switch
               </button>
@@ -580,24 +642,24 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
           const c = VERDICT_COLORS[analysis.verdict] || VERDICT_COLORS.insufficient
           return (
             <div>
-              <div style={{ background: c.bg, border: `1px solid ${c.border}`, borderRadius: 6, padding: '12px 14px', marginBottom: 12 }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 700, letterSpacing: 2, color: c.text, marginBottom: 6 }}>{c.label}</div>
-                <div style={{ fontSize: 13, color: 'var(--text)', marginBottom: 6, lineHeight: 1.6 }}>{analysis.summary}</div>
-                <div style={{ fontSize: 12, color: 'var(--text2)', lineHeight: 1.5 }}>{analysis.reasoning}</div>
-                <div style={{ display: 'flex', gap: 16, marginTop: 10, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 11, color: 'var(--text3)' }}>📅 {analysis.sessions} sessions analysed</span>
-                  <span style={{ fontSize: 11, color: 'var(--text3)' }}>📊 {Math.round((analysis.sessionsPerWeek || 0) * 10) / 10} sessions/wk avg</span>
-                  <span style={{ fontSize: 11, color: 'var(--text3)' }}>💭 {Math.round((analysis.avgFeel || 0) * 10) / 10}/5 avg feel</span>
+              <div className="mb-3 rounded-md border px-3.5 py-3" style={{ background: c.bg, borderColor: c.border }}>
+                <div className="mb-1.5 text-xs font-bold uppercase tracking-[2px]" style={{ fontFamily: 'var(--font-display)', color: c.text }}>{c.label}</div>
+                <div className="mb-1.5 text-[13px] leading-[1.6]" style={{ color: 'var(--text)' }}>{analysis.summary}</div>
+                <div className="text-xs leading-normal" style={{ color: 'var(--text2)' }}>{analysis.reasoning}</div>
+                <div className="mt-2.5 flex flex-wrap gap-4">
+                  <span className="text-[11px]" style={{ color: 'var(--text3)' }}>📅 {analysis.sessions} sessions analysed</span>
+                  <span className="text-[11px]" style={{ color: 'var(--text3)' }}>📊 {Math.round((analysis.sessionsPerWeek || 0) * 10) / 10} sessions/wk avg</span>
+                  <span className="text-[11px]" style={{ color: 'var(--text3)' }}>💭 {Math.round((analysis.avgFeel || 0) * 10) / 10}/5 avg feel</span>
                 </div>
               </div>
 
               {(analysis.top3?.length ?? 0) > 0 && (
-                <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 11, fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 1, color: 'var(--text3)', textTransform: 'uppercase', marginBottom: 6 }}>Top Progressing Lifts</div>
+                <div className="mb-3">
+                  <div className="mb-1.5 text-[11px] font-bold uppercase tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--text3)' }}>Top Progressing Lifts</div>
                   {analysis.top3!.map((t, i) => (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 0', borderBottom: '1px solid var(--border)' }}>
-                      <span style={{ fontSize: 13, color: 'var(--text)' }}>{t.name}</span>
-                      <span style={{ fontSize: 12, color: 'var(--accent)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>
+                    <div key={i} className="flex items-center justify-between border-b py-[5px]" style={{ borderColor: 'var(--border)' }}>
+                      <span className="text-[13px]" style={{ color: 'var(--text)' }}>{t.name}</span>
+                      <span className="text-xs font-bold" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>
                         {t.weightDelta > 0 ? `+${Math.round(t.weightDelta)}lbs` : ''}{t.repDelta >= 1 ? ` +${Math.round(t.repDelta)} reps` : ''}
                       </span>
                     </div>
@@ -605,7 +667,7 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
                 </div>
               )}
 
-              <div className="btn-row" style={{ flexWrap: 'wrap' }}>
+              <div className="btn-row flex-wrap">
                 <button className="btn btn-primary btn-sm" onClick={requestCoachSplit}>
                   ✦ Get Coach Recommendation
                 </button>
@@ -627,26 +689,26 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
 
         {switchStep === 'deload_offer' && analysis && (
           <div>
-            <div style={{ background: '#0a0f00', border: '1px solid var(--accent)', borderRadius: 6, padding: '12px 14px', marginBottom: 12 }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 12, fontWeight: 700, letterSpacing: 2, color: 'var(--accent)', marginBottom: 6 }}>BEFORE YOU GO</div>
+            <div className="mb-3 rounded-md border px-3.5 py-3" style={{ background: '#0a0f00', borderColor: 'var(--accent)' }}>
+              <div className="mb-1.5 text-xs font-bold uppercase tracking-[2px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--accent)' }}>BEFORE YOU GO</div>
               {(analysis.top3?.length ?? 0) > 0 && (
-                <div style={{ marginBottom: 10 }}>
-                  <div style={{ fontSize: 13, color: 'var(--text2)', marginBottom: 8 }}>These lifts are still moving — you&apos;d be walking away from:</div>
+                <div className="mb-2.5">
+                  <div className="mb-2 text-[13px]" style={{ color: 'var(--text2)' }}>These lifts are still moving — you&apos;d be walking away from:</div>
                   {analysis.top3!.map((t, i) => (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid var(--border)' }}>
-                      <span style={{ fontSize: 13, color: 'var(--text)' }}>{t.name}</span>
-                      <span style={{ fontSize: 12, color: 'var(--accent)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>
+                    <div key={i} className="flex justify-between border-b py-1" style={{ borderColor: 'var(--border)' }}>
+                      <span className="text-[13px]" style={{ color: 'var(--text)' }}>{t.name}</span>
+                      <span className="text-xs font-bold" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>
                         {t.weightDelta > 0 ? `+${Math.round(t.weightDelta)}lbs` : ''}{t.repDelta >= 1 ? ` +${Math.round(t.repDelta)} reps` : ''} over 6 weeks
                       </span>
                     </div>
                   ))}
                 </div>
               )}
-              <div style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.6 }}>
+              <div className="text-[13px] leading-[1.6]" style={{ color: 'var(--text2)' }}>
                 A deload week (60-70% loads, same structure) often breaks a mental rut without losing the program momentum you&apos;ve built.
               </div>
             </div>
-            <div className="btn-row" style={{ flexWrap: 'wrap' }}>
+            <div className="btn-row flex-wrap">
               <button className="btn btn-primary btn-sm" onClick={() => { setSwitchStep(null); setAnalysis(null); onPhaseChange('recovery') }}>
                 Take a deload week
               </button>
@@ -662,10 +724,10 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
         )}
 
         {switchStep === 'coach_generating' && (
-          <div style={{ textAlign: 'center', padding: '24px 0' }}>
-            <div className="loading-dots" style={{ justifyContent: 'center', marginBottom: 12 }}><span /><span /><span /></div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, letterSpacing: 2, color: 'var(--accent)', textTransform: 'uppercase' }}>Analysing your data...</div>
-            <div style={{ fontSize: 12, color: 'var(--text3)', marginTop: 6 }}>Reviewing volume, lagging muscles, consistency, and any active injury constraints</div>
+          <div className="py-6 text-center">
+            <div className="loading-dots mb-3 justify-center"><span /><span /><span /></div>
+            <div className="text-[13px] font-bold uppercase tracking-[2px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--accent)' }}>Analysing your data...</div>
+            <div className="mt-1.5 text-xs" style={{ color: 'var(--text3)' }}>Reviewing volume, lagging muscles, consistency, and any active injury constraints</div>
           </div>
         )}
 
@@ -688,36 +750,36 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
 
         {switchStep === 'coach_review' && coachSplit && (
           <div>
-            <div style={{ background: '#050f00', border: '1px solid var(--accent)', borderRadius: 6, padding: '12px 14px', marginBottom: 14 }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 700, letterSpacing: 2, color: 'var(--accent)', marginBottom: 6 }}>✦ COACH RECOMMENDATION: {coachSplit.name}</div>
-              <div style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.6 }}>{coachSplit.rationale}</div>
+            <div className="mb-3.5 rounded-md border px-3.5 py-3" style={{ background: '#050f00', borderColor: 'var(--accent)' }}>
+              <div className="mb-1.5 text-[13px] font-bold uppercase tracking-[2px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--accent)' }}>✦ COACH RECOMMENDATION: {coachSplit.name}</div>
+              <div className="text-[13px] leading-[1.6]" style={{ color: 'var(--text2)' }}>{coachSplit.rationale}</div>
             </div>
 
             {(coachSplit.days || []).map((day, di) => (
-              <div key={di} style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 6, padding: '10px 12px', marginBottom: 8 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
+              <div key={di} className="mb-2 rounded-md border px-3 py-2.5" style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>
+                <div className="mb-1.5 flex items-baseline justify-between">
                   <div>
-                    <span style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 900, color: 'var(--accent)', letterSpacing: 1, textTransform: 'uppercase', marginRight: 8 }}>{day.label}</span>
-                    <span style={{ fontSize: 11, color: 'var(--text3)' }}>{day.focus}</span>
+                    <span className="mr-2 text-[15px] font-black uppercase tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--accent)' }}>{day.label}</span>
+                    <span className="text-[11px]" style={{ color: 'var(--text3)' }}>{day.focus}</span>
                   </div>
-                  <span style={{ fontSize: 11, fontFamily: 'var(--font-display)', color: 'var(--text3)', letterSpacing: 1 }}>{day.suggestedDay}</span>
+                  <span className="text-[11px] tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--text3)' }}>{day.suggestedDay}</span>
                 </div>
-                {day.note && <div style={{ fontSize: 11, color: 'var(--accent2)', marginBottom: 8, fontStyle: 'italic' }}>{day.note}</div>}
-                <div style={{ display: 'grid', gap: 4 }}>
+                {day.note && <div className="mb-2 text-[11px] italic" style={{ color: 'var(--accent2)' }}>{day.note}</div>}
+                <div className="grid gap-1">
                   {(day.exercises || []).map((ex, ei) => (
-                    <div key={ei} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0', borderBottom: '1px solid var(--border)' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: 13, color: 'var(--text)' }}>{ex.name}</span>
-                        {ex.priority && <span style={{ fontSize: 10, fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 1, color: '#f5a742', background: '#2d1a00', padding: '1px 5px', borderRadius: 3 }}>PRIORITY</span>}
+                    <div key={ei} className="flex items-center justify-between border-b py-1" style={{ borderColor: 'var(--border)' }}>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="text-[13px]" style={{ color: 'var(--text)' }}>{ex.name}</span>
+                        {ex.priority && <span className="rounded-[3px] px-[5px] py-px text-[10px] font-bold tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: '#f5a742', background: '#2d1a00' }}>PRIORITY</span>}
                       </div>
-                      <span style={{ fontSize: 11, color: 'var(--text3)', fontFamily: 'var(--font-display)', whiteSpace: 'nowrap' }}>{ex.sets}×{ex.repRange}</span>
+                      <span className="whitespace-nowrap text-[11px]" style={{ color: 'var(--text3)', fontFamily: 'var(--font-display)' }}>{ex.sets}×{ex.repRange}</span>
                     </div>
                   ))}
                 </div>
               </div>
             ))}
 
-            <div style={{ fontSize: 11, color: 'var(--text3)', marginBottom: 12 }}>
+            <div className="mb-3 text-[11px]" style={{ color: 'var(--text3)' }}>
               Accepting this will archive your current program and load this split as the new active program.
             </div>
             <div className="btn-row">
@@ -730,15 +792,15 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
 
         {switchStep === 'name_new' && (
           <div>
-            <div style={{ fontSize: 13, color: 'var(--text2)', marginBottom: 12, lineHeight: 1.6 }}>
+            <div className="mb-3 text-[13px] leading-[1.6]" style={{ color: 'var(--text2)' }}>
               Your current program will be archived with all its history intact. Give the new program a name to begin.
             </div>
             <input
-              className="inp"
+              className="inp mb-3 font-bold tracking-[1px]"
               placeholder="New program name (e.g. Upper/Lower, Full Body, PPL v2)"
               value={newProgramName}
               onChange={e => setNewProgramName(e.target.value)}
-              style={{ marginBottom: 12, fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 1 }}
+              style={{ fontFamily: 'var(--font-display)' }}
             />
             <div className="btn-row">
               <button
@@ -758,43 +820,40 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
         <div className="card">
           <button
             onClick={() => setShowLibrary(s => !s)}
-            style={{
-              all: 'unset', cursor: 'pointer', width: '100%',
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            }}
+            className="flex w-full cursor-pointer items-center justify-between border-0 bg-transparent p-0 text-inherit"
             aria-expanded={showLibrary}
           >
-            <div className="card-title" style={{ marginBottom: 0 }}>
+            <div className="card-title mb-0">
               My Exercise Library
-              <span style={{ marginLeft: 8, fontSize: 11, fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: 1, color: 'var(--text3)' }}>
+              <span className="ml-2 text-[11px] font-bold tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--text3)' }}>
                 {customExercises.length}
               </span>
             </div>
-            <span style={{ fontSize: 12, color: 'var(--text3)', fontFamily: 'var(--font-display)', letterSpacing: 1 }}>
+            <span className="text-xs tracking-[1px]" style={{ color: 'var(--text3)', fontFamily: 'var(--font-display)' }}>
               {showLibrary ? '▾' : '▸'}
             </span>
           </button>
 
           {showLibrary && (
-            <div style={{ marginTop: 12 }}>
-              <div style={{ display: 'grid', gap: 6 }}>
+            <div className="mt-3">
+              <div className="grid gap-1.5">
                 {customExercises.map((ex, i) => (
-                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+                  <div key={i} className="flex items-center justify-between border-b py-1.5" style={{ borderColor: 'var(--border)' }}>
                     <div>
-                      <div style={{ fontSize: 13, color: 'var(--text)', fontWeight: 600 }}>{ex.name}</div>
-                      <div style={{ fontSize: 11, color: 'var(--text3)' }}>
+                      <div className="text-[13px] font-semibold" style={{ color: 'var(--text)' }}>{ex.name}</div>
+                      <div className="text-[11px]" style={{ color: 'var(--text3)' }}>
                         {ex.muscles?.map(m => m.replace('_', ' ')).join(', ')} · {ex.repRange}
                       </div>
                     </div>
                     <button
-                      className="btn btn-secondary btn-sm"
-                      style={{ fontSize: 11, color: 'var(--red)', borderColor: 'var(--red)' }}
+                      className="btn btn-secondary btn-sm text-[11px]"
+                      style={{ color: 'var(--red)', borderColor: 'var(--red)' }}
                       onClick={() => onDeleteCustomExercise(ex.name)}
                     >Remove</button>
                   </div>
                 ))}
               </div>
-              <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 8 }}>
+              <div className="mt-2 text-[11px]" style={{ color: 'var(--text3)' }}>
                 These appear in the exercise picker alongside the built-in library.
               </div>
             </div>
@@ -806,10 +865,10 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
         <div className="card">
           <div className="card-title">Past Programs</div>
           {archivedPrograms.map((p, i) => (
-            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
+            <div key={i} className="flex items-center justify-between border-b py-2" style={{ borderColor: 'var(--border)' }}>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)' }}>{p.name}</div>
-                <div style={{ fontSize: 12, color: 'var(--text3)' }}>{fmtDate(p.startDate)} — {fmtDate(p.endDate)} · {p.sessionCount} sessions</div>
+                <div className="text-sm font-semibold" style={{ color: 'var(--text)' }}>{p.name}</div>
+                <div className="text-xs" style={{ color: 'var(--text3)' }}>{fmtDate(p.startDate)} — {fmtDate(p.endDate)} · {p.sessionCount} sessions</div>
               </div>
             </div>
           ))}

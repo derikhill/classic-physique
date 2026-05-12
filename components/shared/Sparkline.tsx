@@ -19,7 +19,7 @@ export default function Sparkline({
     return `${x},${y}`
   })
   return (
-    <svg width={width} height={height} style={{ display: 'block' }}>
+    <svg width={width} height={height} className="block">
       <polyline
         points={pts.join(' ')}
         fill="none"
