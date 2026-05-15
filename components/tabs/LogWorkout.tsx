@@ -610,6 +610,7 @@ export default function LogWorkout({
                     const ghost = ghostWeightFor(ex, si)
                     return (
                       <input
+                        type="number"
                         className="inp inp-sm justify-self-center"
                         placeholder={ghost !== null ? `↑ ${ghost}` : '—'}
                         value={s.weight || ''}
@@ -624,7 +625,7 @@ export default function LogWorkout({
                       />
                     )
                   })()}
-                  <input className="inp inp-sm justify-self-center" placeholder="—" value={s.reps || ''}
+                  <input type="number" className="inp inp-sm justify-self-center" placeholder="—" value={s.reps || ''}
                     onChange={e => updateSet(ei, si, 'reps', e.target.value)}
                     onBlur={e => cascadeSet(ei, si, 'reps', e.target.value)} />
                   <select className="inp inp-xs" value={s.rir || ''} onChange={e => updateSet(ei, si, 'rir', e.target.value)}>
@@ -644,6 +645,7 @@ export default function LogWorkout({
                   <div className="mt-1 flex items-center gap-2 pl-8 pr-7">
                     <span className="whitespace-nowrap text-[11px] font-bold" style={{ color: '#a78bfa', fontFamily: 'var(--font-display)' }}>+ PAUSE</span>
                     <input
+                      type="number"
                       className="inp inp-sm"
                       placeholder="reps after pause"
                       value={s.pauseReps || ''}
@@ -659,11 +661,11 @@ export default function LogWorkout({
                     {(s.drops || []).map((d, di) => (
                       <div key={di} className="drop-segment">
                         <span className="min-w-9 text-[10px] font-bold" style={{ color: '#f59e0b', fontFamily: 'var(--font-display)' }}>DROP {di + 1}</span>
-                        <input className="inp inp-sm w-[70px]" placeholder="lbs" value={d.weight}
+                        <input type="number" className="inp inp-sm w-[70px]" placeholder="lbs" value={d.weight}
                           onChange={e => updateDrop(ei, si, di, 'weight', e.target.value)}
                           style={{ borderColor: '#f59e0b44' }} />
                         <span className="text-[11px]" style={{ color: 'var(--text3)' }}>×</span>
-                        <input className="inp inp-sm w-[60px]" placeholder="reps" value={d.reps}
+                        <input type="number" className="inp inp-sm w-[60px]" placeholder="reps" value={d.reps}
                           onChange={e => updateDrop(ei, si, di, 'reps', e.target.value)}
                           style={{ borderColor: '#f59e0b44' }} />
                         <button className="btn-rm ml-auto" onClick={() => removeDrop(ei, si, di)}>×</button>

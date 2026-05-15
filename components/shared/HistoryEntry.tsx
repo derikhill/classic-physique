@@ -153,8 +153,8 @@ export default function HistoryEntry({
                   {ex.sets.map((s, si) => (
                     <tr key={si}>
                       <td><span className="set-num">{si + 1}</span></td>
-                      <td><input className="inp inp-sm" value={s.weight || ''} onChange={e => updateDraftSet(ei, si, 'weight', e.target.value)} placeholder="—" /></td>
-                      <td><input className="inp inp-sm" value={s.reps || ''} onChange={e => updateDraftSet(ei, si, 'reps', e.target.value)} placeholder="—" /></td>
+                      <td><input type="number" className="inp inp-sm" value={s.weight || ''} onChange={e => updateDraftSet(ei, si, 'weight', e.target.value)} placeholder="—" /></td>
+                      <td><input type="number" className="inp inp-sm" value={s.reps || ''} onChange={e => updateDraftSet(ei, si, 'reps', e.target.value)} placeholder="—" /></td>
                       <td>
                         <select className="inp inp-xs" value={s.rir || ''} onChange={e => updateDraftSet(ei, si, 'rir', e.target.value)}>
                           {['0', '1', '2', '3', '4+'].map(r => <option key={r} value={r}>{r}</option>)}

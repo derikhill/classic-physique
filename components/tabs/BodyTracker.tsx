@@ -160,11 +160,11 @@ export default function BodyTracker({
             </div>
             <div>
               <div className="macro-lbl mb-1">Weight (lbs)</div>
-              <input className="inp inp-sm w-[90px]" placeholder="e.g. 185.5" value={weight} onChange={e => setWeight(e.target.value)} />
+              <input type="number" className="inp inp-sm w-[90px]" placeholder="e.g. 185.5" value={weight} onChange={e => setWeight(e.target.value)} />
             </div>
             <div>
               <div className="macro-lbl mb-1">Body Fat %</div>
-              <input className="inp inp-sm w-[90px]" placeholder="e.g. 16.5" value={bf} onChange={e => setBf(e.target.value)} />
+              <input type="number" className="inp inp-sm w-[90px]" placeholder="e.g. 16.5" value={bf} onChange={e => setBf(e.target.value)} />
             </div>
           </div>
         </div>
@@ -185,7 +185,7 @@ export default function BodyTracker({
             ].map(({ label, val, set, placeholder }) => (
               <div key={label}>
                 <div className="macro-lbl mb-1">{label}</div>
-                <input className="inp inp-sm w-[86px]" placeholder={placeholder} value={val} onChange={e => set(e.target.value)} />
+                <input type="number" className="inp inp-sm w-[86px]" placeholder={placeholder} value={val} onChange={e => set(e.target.value)} />
               </div>
             ))}
           </div>
@@ -225,6 +225,7 @@ export default function BodyTracker({
                 <div key={key}>
                   <div className="macro-lbl mb-1">{label}</div>
                   <input
+                    type="number"
                     className="inp inp-sm w-[90px]"
                     placeholder={placeholder}
                     value={targetDraft[key] || ''}
