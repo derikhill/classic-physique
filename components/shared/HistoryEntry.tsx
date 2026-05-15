@@ -133,7 +133,7 @@ export default function HistoryEntry({
             <div className="rounded-md border px-3 py-2.5" style={{ background: 'var(--surface3)', borderColor: 'var(--border)' }}>
               <div className="mb-2 flex items-center gap-2">
                 <input
-                  className="inp text-[13px] font-semibold"
+                  className="inp font-semibold"
                   value={ex.name}
                   onChange={e => updateDraftExName(ei, e.target.value)}
                 />

@@ -270,9 +270,9 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
             {phase === 'cut' ? '🎯 Cut Goal' : phase === 'build' ? '🎯 Build Goal' : phase === 'maintenance' ? '🎯 Maintenance Goal' : '🎯 Recovery Goal'}
           </div>
           <div className="flex gap-1.5">
-            {currentGoal && !editingGoals && <button className="btn btn-secondary btn-sm text-[11px]" onClick={openGoals}>Edit</button>}
-            {!currentGoal && !editingGoals && <button className="btn btn-secondary btn-sm text-[11px]" onClick={openGoals}>Set Goal</button>}
-            {editingGoals && <button className="btn btn-secondary btn-sm text-[11px]" onClick={() => setEditingGoals(false)}>Cancel</button>}
+            {currentGoal && !editingGoals && <button className="btn btn-secondary btn-sm" onClick={openGoals}>Edit</button>}
+            {!currentGoal && !editingGoals && <button className="btn btn-secondary btn-sm" onClick={openGoals}>Set Goal</button>}
+            {editingGoals && <button className="btn btn-secondary btn-sm" onClick={() => setEditingGoals(false)}>Cancel</button>}
           </div>
         </div>
 
@@ -280,10 +280,10 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
           const g = currentGoal
           if (phase === 'cut') return (
             <div className="grid gap-1.5">
-              {g.mode === 'rate' && <div className="text-[13px]" style={{ color: 'var(--text2)' }}>Target rate: <span className="font-bold" style={{ color: 'var(--accent)' }}>{g.targetRate} lbs/week</span></div>}
+              {g.mode === 'rate' && <div className="" style={{ color: 'var(--text2)' }}>Target rate: <span className="font-bold" style={{ color: 'var(--accent)' }}>{g.targetRate} lbs/week</span></div>}
               {g.mode === 'deadline' && <>
-                <div className="text-[13px]" style={{ color: 'var(--text2)' }}>Goal weight: <span className="font-bold" style={{ color: 'var(--accent)' }}>{g.targetWeight} lbs</span></div>
-                <div className="text-[13px]" style={{ color: 'var(--text2)' }}>Deadline: <span className="font-bold" style={{ color: 'var(--accent)' }}>{g.deadline}</span></div>
+                <div className="" style={{ color: 'var(--text2)' }}>Goal weight: <span className="font-bold" style={{ color: 'var(--accent)' }}>{g.targetWeight} lbs</span></div>
+                <div className="" style={{ color: 'var(--text2)' }}>Deadline: <span className="font-bold" style={{ color: 'var(--accent)' }}>{g.deadline}</span></div>
               </>}
               {g.note && <div className="text-xs italic" style={{ color: 'var(--text3)' }}>{g.note}</div>}
               <button className="btn btn-secondary btn-sm mt-1 self-start text-[11px]" style={{ color: 'var(--red)', borderColor: 'var(--red)' }} onClick={clearGoals}>Clear Goal</button>
@@ -291,14 +291,14 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
           )
           if (phase === 'build') return (
             <div className="grid gap-1.5">
-              {g.mode === 'overall' && <div className="text-[13px]" style={{ color: 'var(--text2)' }}>Mode: <span className="font-bold" style={{ color: 'var(--accent)' }}>Overall growth</span></div>}
-              {g.mode === 'priority' && <div className="text-[13px]" style={{ color: 'var(--text2)' }}>Priority: <span className="font-bold" style={{ color: 'var(--accent)' }}>{(g.muscles || []).map(m => m.replace('_', ' ')).join(', ')}</span></div>}
-              {g.mode === 'strength' && <div className="text-[13px]" style={{ color: 'var(--text2)' }}>Strength goal: <span className="font-bold" style={{ color: 'var(--accent)' }}>{g.lift} — {g.targetWeight}lbs × {g.targetReps} reps</span></div>}
+              {g.mode === 'overall' && <div className="" style={{ color: 'var(--text2)' }}>Mode: <span className="font-bold" style={{ color: 'var(--accent)' }}>Overall growth</span></div>}
+              {g.mode === 'priority' && <div className="" style={{ color: 'var(--text2)' }}>Priority: <span className="font-bold" style={{ color: 'var(--accent)' }}>{(g.muscles || []).map(m => m.replace('_', ' ')).join(', ')}</span></div>}
+              {g.mode === 'strength' && <div className="" style={{ color: 'var(--text2)' }}>Strength goal: <span className="font-bold" style={{ color: 'var(--accent)' }}>{g.lift} — {g.targetWeight}lbs × {g.targetReps} reps</span></div>}
               {g.note && <div className="text-xs italic" style={{ color: 'var(--text3)' }}>{g.note}</div>}
               <button className="btn btn-secondary btn-sm mt-1 self-start text-[11px]" style={{ color: 'var(--red)', borderColor: 'var(--red)' }} onClick={clearGoals}>Clear Goal</button>
             </div>
           )
-          return <div className="text-[13px]" style={{ color: 'var(--text3)' }}>Goal set.</div>
+          return <div className="text-lg" style={{ color: 'var(--text3)' }}>Goal set.</div>
         })()}
 
         {editingGoals && (
@@ -312,7 +312,7 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
                       <div
                         key={m.id}
                         onClick={() => setGoalDraft(d => ({ ...d, mode: m.id }))}
-                        className="cursor-pointer rounded-[5px] border px-3.5 py-2 text-[13px]"
+                        className="cursor-pointer rounded-[5px] border px-3.5 py-2"
                         style={{
                           borderColor: goalDraft.mode === m.id ? 'var(--accent)' : 'var(--border)',
                           background: goalDraft.mode === m.id ? '#0a1400' : 'var(--surface2)',
@@ -330,7 +330,7 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
                     <div className="macro-lbl mb-1.5">Target rate of loss (lbs/week)</div>
                     <input className="inp inp-sm w-[120px]" placeholder="e.g. 1.5"
                       value={goalDraft.targetRate || ''} onChange={e => setGoalDraft(d => ({ ...d, targetRate: e.target.value }))} />
-                    <div className="mt-1 text-[11px]" style={{ color: 'var(--text3)' }}>0.5–1% of bodyweight/week is the natural range. Above 1% risks muscle loss.</div>
+                    <div className="mt-1 text-[14px]" style={{ color: 'var(--text3)' }}>0.5–1% of bodyweight/week is the natural range. Above 1% risks muscle loss.</div>
                   </div>
                 )}
 
@@ -366,7 +366,7 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
                       <div
                         key={m.id}
                         onClick={() => setGoalDraft(d => ({ ...d, mode: m.id, muscles: [], lift: '', targetWeight: '', targetReps: '' }))}
-                        className="cursor-pointer rounded-[5px] border px-3.5 py-2 text-[13px]"
+                        className="cursor-pointer rounded-[5px] border px-3.5 py-2 text-[14px]"
                         style={{
                           borderColor: goalDraft.mode === m.id ? 'var(--accent)' : 'var(--border)',
                           background: goalDraft.mode === m.id ? '#0a1400' : 'var(--surface2)',
@@ -396,7 +396,7 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
                                 muscles: selected ? d.muscles!.filter(x => x !== m) : [...(d.muscles || []), m],
                               }))
                             }}
-                            className={`rounded border px-3 py-[5px] text-xs capitalize ${maxed ? 'cursor-default' : 'cursor-pointer'}`}
+                            className={`rounded border px-3 py-[5px] text-sm capitalize ${maxed ? 'cursor-default' : 'cursor-pointer'}`}
                             style={{
                               borderColor: selected ? 'var(--accent)' : 'var(--border)',
                               background: selected ? '#0a1400' : 'var(--surface2)',
@@ -457,7 +457,7 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
         )}
 
         {!currentGoal && !editingGoals && (
-          <div className="mt-2 text-[13px]" style={{ color: 'var(--text3)' }}>
+          <div className="mt-2 text-[14px]" style={{ color: 'var(--text3)' }}>
             {phase === 'cut' ? 'Set a rate target or deadline to track your cut against a specific goal.' : phase === 'build' ? 'Set a build focus — overall growth, a priority muscle, or a strength target.' : 'Optional — add a note for what this phase is working toward.'}
           </div>
         )}
@@ -477,7 +477,7 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
             <div className="mb-1 flex items-center justify-between">
               <div className="card-title mb-0">Split Order</div>
               {splitOrder && (
-                <button className="btn btn-secondary btn-sm text-[11px]" onClick={() => onSplitOrder(null)}>Reset</button>
+                <button className="btn btn-secondary btn-sm" onClick={() => onSplitOrder(null)}>Reset</button>
               )}
             </div>
             <div className="mb-2.5 text-xs" style={{ color: 'var(--text3)' }}>Drag the days into the order you train them. Reflected in the Log tab.</div>
@@ -495,13 +495,13 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
               <div className="card-title mb-1" style={{ color: 'var(--accent2)' }}>
                 {RECOVERY_REASONS.find(r => r.id === recoveryContext.reason)?.icon || '⚡'} Recovery Mode Active
               </div>
-              <div className="text-[13px]" style={{ color: 'var(--text2)' }}>
+              <div className="" style={{ color: 'var(--text2)' }}>
                 {RECOVERY_REASONS.find(r => r.id === recoveryContext.reason)?.label || recoveryContext.reason}
                 {recoveryContext.injuryDetail && <span className="ml-1.5" style={{ color: 'var(--accent2)' }}>— {recoveryContext.injuryDetail}</span>}
               </div>
-              <div className="mt-1 text-[11px]" style={{ color: 'var(--text3)' }}>Since {recoveryContext.startDate}</div>
+              <div className="mt-1 text-[14px]" style={{ color: 'var(--text3)' }}>Since {recoveryContext.startDate}</div>
             </div>
-            <button className="btn btn-secondary btn-sm text-[11px]" onClick={() => onRecoveryContext(null)}>
+            <button className="btn btn-secondary btn-sm" onClick={() => onRecoveryContext(null)}>
               Clear
             </button>
           </div>
@@ -559,7 +559,7 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
 
       <div className="card">
         <div className="card-title">Your Profile</div>
-        <div className="text-[13px] leading-loose" style={{ color: 'var(--text2)' }}>
+        <div className="leading-loose" style={{ color: 'var(--text2)' }}>
           <div><strong className="tracking-[1px]" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>Goal:</strong> 80s/90s era classic physique — proportional, full muscle bellies</div>
           <div><strong className="tracking-[1px]" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>Rep Range:</strong> 8-12 compounds · 12-20 isolation · 0-1 RIR</div>
           <div><strong className="tracking-[1px]" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>Volume Target:</strong> 16-24 sets/muscle/week across both sessions</div>
@@ -587,8 +587,8 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
                     })
                 return items.map(({ day, label, detail }, i) => (
                   <div key={`${day}-${i}`} className="flex items-baseline gap-2">
-                    <span className="w-7 text-[11px] font-bold tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--text3)' }}>{day}</span>
-                    <span className="text-[13px] font-bold" style={{ fontFamily: 'var(--font-display)', color: label === 'Rest' ? 'var(--text3)' : 'var(--accent)' }}>{label}</span>
+                    <span className="w-7 font-bold tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--text3)' }}>{day}</span>
+                    <span className="font-bold" style={{ fontFamily: 'var(--font-display)', color: label === 'Rest' ? 'var(--text3)' : 'var(--accent)' }}>{label}</span>
                     {detail && <span className="text-xs" style={{ color: 'var(--text3)' }}>{detail}</span>}
                   </div>
                 ))
@@ -643,23 +643,23 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
           return (
             <div>
               <div className="mb-3 rounded-md border px-3.5 py-3" style={{ background: c.bg, borderColor: c.border }}>
-                <div className="mb-1.5 text-xs font-bold uppercase tracking-[2px]" style={{ fontFamily: 'var(--font-display)', color: c.text }}>{c.label}</div>
-                <div className="mb-1.5 text-[13px] leading-[1.6]" style={{ color: 'var(--text)' }}>{analysis.summary}</div>
-                <div className="text-xs leading-normal" style={{ color: 'var(--text2)' }}>{analysis.reasoning}</div>
+                <div className="mb-1.5 font-bold uppercase tracking-[2px]" style={{ fontFamily: 'var(--font-display)', color: c.text }}>{c.label}</div>
+                <div className="mb-1.5 leading-[1.6]" style={{ color: 'var(--text)' }}>{analysis.summary}</div>
+                <div className="text-sm leading-normal" style={{ color: 'var(--text2)' }}>{analysis.reasoning}</div>
                 <div className="mt-2.5 flex flex-wrap gap-4">
-                  <span className="text-[11px]" style={{ color: 'var(--text3)' }}>📅 {analysis.sessions} sessions analysed</span>
-                  <span className="text-[11px]" style={{ color: 'var(--text3)' }}>📊 {Math.round((analysis.sessionsPerWeek || 0) * 10) / 10} sessions/wk avg</span>
-                  <span className="text-[11px]" style={{ color: 'var(--text3)' }}>💭 {Math.round((analysis.avgFeel || 0) * 10) / 10}/5 avg feel</span>
+                  <span className="text-[13px]" style={{ color: 'var(--text3)' }}>📅 {analysis.sessions} sessions analysed</span>
+                  <span className="text-[13px]" style={{ color: 'var(--text3)' }}>📊 {Math.round((analysis.sessionsPerWeek || 0) * 10) / 10} sessions/wk avg</span>
+                  <span className="text-[13px]" style={{ color: 'var(--text3)' }}>💭 {Math.round((analysis.avgFeel || 0) * 10) / 10}/5 avg feel</span>
                 </div>
               </div>
 
               {(analysis.top3?.length ?? 0) > 0 && (
                 <div className="mb-3">
-                  <div className="mb-1.5 text-[11px] font-bold uppercase tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--text3)' }}>Top Progressing Lifts</div>
+                  <div className="mb-1.5 text-[12px] font-bold uppercase tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--text3)' }}>Top Progressing Lifts</div>
                   {analysis.top3!.map((t, i) => (
                     <div key={i} className="flex items-center justify-between border-b py-[5px]" style={{ borderColor: 'var(--border)' }}>
-                      <span className="text-[13px]" style={{ color: 'var(--text)' }}>{t.name}</span>
-                      <span className="text-xs font-bold" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>
+                      <span className="" style={{ color: 'var(--text)' }}>{t.name}</span>
+                      <span className="text-sm font-bold" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>
                         {t.weightDelta > 0 ? `+${Math.round(t.weightDelta)}lbs` : ''}{t.repDelta >= 1 ? ` +${Math.round(t.repDelta)} reps` : ''}
                       </span>
                     </div>

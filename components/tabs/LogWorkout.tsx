@@ -41,7 +41,7 @@ function PairedWithLabel({ linkType, partnerName }: { linkType: 'superset' | 'co
     <div className="mt-2 flex items-center gap-1.5 border-t border-dashed pt-2" style={{ borderColor: 'var(--border)' }}>
       <span className="font-bold tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color }}>{typeLabel}</span>
       <span className="text-[11px]" style={{ color: 'var(--text3)' }}>paired with</span>
-      <span className="text-[11px] font-semibold" style={{ color }}>{partnerName}</span>
+      <span className="text-[12px] font-semibold" style={{ color }}>{partnerName}</span>
     </div>
   )
 }
@@ -360,7 +360,7 @@ export default function LogWorkout({
       <div className="card">
         <div className="card-title">Split Day</div>
         {activeCoachSplit && (
-          <div className="mb-2 flex items-center gap-1.5 text-[11px] font-bold tracking-[1px]" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>
+          <div className="mb-2 flex items-center gap-1.5 text-[14px] font-bold tracking-[1px]" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>
             <span>✦ COACH PROGRAM ACTIVE:</span>
             <span style={{ color: 'var(--text2)' }}>{activeCoachSplit.name}</span>
           </div>
@@ -403,7 +403,7 @@ export default function LogWorkout({
                 <button
                   key={n}
                   onClick={() => setFeel(n)}
-                  className="h-9 w-9 cursor-pointer rounded border text-[13px] font-bold"
+                  className="h-9 w-9 cursor-pointer rounded border font-bold"
                   style={{
                     fontFamily: 'var(--font-display)',
                     borderColor: feel === n ? 'var(--accent)' : 'var(--border)',
@@ -453,7 +453,7 @@ export default function LogWorkout({
                     <button
                       key={i}
                       onClick={() => set(i + 1)}
-                      className="cursor-pointer rounded border px-3 py-[5px] text-xs font-bold tracking-[1px]"
+                      className="cursor-pointer rounded border px-3 py-[5px] text-sm font-bold tracking-[1px]"
                       style={{
                         fontFamily: 'var(--font-display)',
                         borderColor: val === i + 1 ? 'var(--accent2)' : 'var(--border)',
@@ -533,8 +533,8 @@ export default function LogWorkout({
         })()} style={autoRegActive && autoRegMap[ex.name] && autoRegMap[ex.name].skip ? { opacity: 0.6, borderColor: 'var(--red)' } : {}}>
           <div className="mb-2.5 flex flex-col md:flex-row items-start justify-between">
             <div>
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-[15px] font-semibold">{ex.name}</span>
+              <div className="flex flex-wrap mb-2.5 items-center gap-1.5">
+                <span className="text-lg font-semibold">{ex.name}</span>
                 {ex.priority && <span className="ex-tag priority">Priority</span>}
                 {(() => {
                   const flag = getExerciseRecoveryFlag(ex.name, recoveryContext)
@@ -548,9 +548,9 @@ export default function LogWorkout({
                   <span className="ex-tag" style={{ background: '#2d0000', color: 'var(--red)' }}>⚑ Skip?</span>
                 )}
               </div>
-              <div className="mt-0.5 flex flex-wrap items-center gap-1 text-[11px]" style={{ color: 'var(--text3)' }}>
+              <div className="mb-2 flex flex-wrap items-center gap-1" style={{ color: 'var(--text3)' }}>
                 <input
-                  className="inp inp-xs h-auto w-[60px] px-1 py-px text-[11px]"
+                  className="inp inp-xs h-auto w-[60px] px-1 py-px"
                   value={ex.repRange || ''}
                   placeholder="8-12"
                   onChange={e => updateRepRange(ei, e.target.value)}
@@ -564,14 +564,14 @@ export default function LogWorkout({
                 if (!prog || !prog.summary) return null
                 const c = SUGGESTION_COLORS[prog.summary.type] || SUGGESTION_COLORS.hold
                 return (
-                  <div className="mt-[5px] inline-flex items-center gap-1.5 rounded border px-2 py-[3px]" style={{ background: c.bg, borderColor: c.border }}>
-                    <span className="text-[10px] font-bold tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: c.text }}>{c.label}</span>
-                    <span className="text-[11px]" style={{ color: c.text }}>{prog.summary.message}</span>
+                  <div className="mb-2 inline-flex items-center gap-1.5 rounded border px-2 py-[3px]" style={{ background: c.bg, borderColor: c.border }}>
+                    <span className="text-[12px] font-bold tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: c.text }}>{c.label}</span>
+                    <span className="" style={{ color: c.text }}>{prog.summary.message}</span>
                   </div>
                 )
               })()}
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex mb-2 items-center gap-1.5">
               <div className="flex flex-col gap-0.5">
                 <MoveBtn disabled={ei === 0} onClick={() => moveExercise(ei, -1)} label="up" />
                 <MoveBtn disabled={ei === exercises.length - 1} onClick={() => moveExercise(ei, 1)} label="dn" />
@@ -587,7 +587,7 @@ export default function LogWorkout({
             if (!prog || !prog.setTargets || !prog.setTargets.length) return null
             return (
               <div className="mb-2 grid gap-[3px] rounded-[5px] px-2.5 py-2" style={{ background: 'var(--surface2)' }}>
-                <div className="mb-1 text-[10px] font-bold tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--text3)' }}>SET TARGETS</div>
+                <div className="mb-1 text-[12px] font-bold tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--text3)' }}>SET TARGETS</div>
                 {prog.setTargets.map((t, ti) => (
                   <SetTargetRow key={ti} target={t} />
                 ))}

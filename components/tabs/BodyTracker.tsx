@@ -152,7 +152,7 @@ export default function BodyTracker({
         <div className="card-title">Daily Check-In</div>
 
         <div className="mb-4">
-          <div className="mb-2 text-[11px] font-bold uppercase tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--accent2)' }}>Today&apos;s Body</div>
+          <div className="mb-2 font-bold uppercase tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: 'var(--accent2)' }}>Today&apos;s Body</div>
           <div className="flex flex-wrap items-end gap-2.5">
             <div>
               <div className="macro-lbl mb-1">Date</div>
@@ -173,7 +173,7 @@ export default function BodyTracker({
 
         <div className="mb-3.5">
           <div className="mb-2 flex flex-wrap items-center gap-2.5">
-            <div className="text-[11px] font-bold uppercase tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: '#42c8f5' }}>Yesterday&apos;s Macros</div>
+            <div className="font-bold uppercase tracking-[1px]" style={{ fontFamily: 'var(--font-display)', color: '#42c8f5' }}>Yesterday&apos;s Macros</div>
             <input type="date" className="inp w-[150px]" value={macroDate} onChange={e => setMacroDate(e.target.value)} />
           </div>
           <div className="flex flex-wrap gap-2.5">
@@ -213,7 +213,7 @@ export default function BodyTracker({
         {editingTargets && (
           <div className="mt-3">
             <div className="mb-2.5 text-xs leading-normal" style={{ color: 'var(--text3)' }}>
-              Paste your targets from your Google Sheet. These stay fixed until you update them — adjust when your cut progresses and targets change.
+              These stay fixed until you update them — adjust when your cut progresses or targets change.
             </div>
             <div className="mb-3 flex flex-wrap gap-2.5">
               {[
@@ -295,7 +295,7 @@ export default function BodyTracker({
 
         {!hasTargets && !editingTargets && (
           <div className="mt-2.5 text-[13px]" style={{ color: 'var(--text3)' }}>
-            Set your daily targets from your Google Sheet and the app will track actuals vs targets each day you log macros.
+            Set your daily targets and the app will track actuals vs targets each day you log macros.
           </div>
         )}
       </div>
@@ -427,9 +427,9 @@ export default function BodyTracker({
           <div className="mb-2.5 grid gap-1.5">
             {weeklyAvgs.map((w, i) => (
               <div key={i} className="flex justify-between border-b py-[5px]" style={{ borderColor: 'var(--border)' }}>
-                <span className="text-[13px]" style={{ color: 'var(--text2)' }}>{w.label}</span>
-                <span className="text-[13px] font-bold" style={{ fontFamily: 'var(--font-display)', color: 'var(--accent2)' }}>
-                  {w.avg} lbs <span className="text-[11px] font-normal" style={{ color: 'var(--text3)' }}>({w.count} days)</span>
+                <span className="text-[15px]" style={{ color: 'var(--text2)' }}>{w.label}</span>
+                <span className="text-[15px] font-bold" style={{ fontFamily: 'var(--font-display)', color: 'var(--accent2)' }}>
+                  {w.avg} lbs <span className="ml-2 text-[12px] font-normal" style={{ color: 'var(--text3)' }}>({w.count} days)</span>
                 </span>
               </div>
             ))}
@@ -439,13 +439,13 @@ export default function BodyTracker({
               background: Math.abs(parseFloat(rateOfChange)) < 0.1 ? 'var(--surface3)' : parseFloat(rateOfChange) < 0 ? '#0a1400' : '#1a0a00',
               borderColor: Math.abs(parseFloat(rateOfChange)) < 0.1 ? 'var(--border)' : parseFloat(rateOfChange) < 0 ? 'var(--accent)' : 'var(--red)',
             }}>
-              <span className="text-[11px] font-bold uppercase tracking-[1px]" style={{
+              <span className="font-bold uppercase tracking-[1px]" style={{
                 fontFamily: 'var(--font-display)',
                 color: parseFloat(rateOfChange) < 0 ? 'var(--accent)' : parseFloat(rateOfChange) > 0 ? 'var(--red)' : 'var(--text3)',
               }}>
                 RATE: {parseFloat(rateOfChange) > 0 ? '+' : ''}{rateOfChange} lbs/week
               </span>
-              <span className="ml-2.5 text-xs" style={{ color: 'var(--text3)' }}>
+              <span className="ml-2.5 text-sm" style={{ color: 'var(--text3)' }}>
                 {phase === 'cut'
                   ? Math.abs(parseFloat(rateOfChange)) >= 0.5 && Math.abs(parseFloat(rateOfChange)) <= 2
                     ? '✓ On target for cut (0.5-2lbs/week)'
@@ -475,8 +475,8 @@ export default function BodyTracker({
                 <th>Weight</th>
                 <th>BF%</th>
                 <th>Est. LBM</th>
-                <th>kcal</th>
-                <th>Protein</th>
+                {/* <th>kcal</th>
+                <th>Protein</th> */}
               </tr>
             </thead>
             <tbody>
@@ -484,12 +484,12 @@ export default function BodyTracker({
                 const lbm = e.weight && e.bf ? (parseFloat(e.weight) * (1 - parseFloat(e.bf) / 100)).toFixed(1) : '—'
                 return (
                   <tr key={i}>
-                    <td className="text-xs" style={{ color: 'var(--text2)' }}>{fmtDate(e.date)}</td>
-                    <td className="text-[13px] font-semibold" style={{ color: 'var(--text)' }}>{e.weight ? `${e.weight} lbs` : '—'}</td>
-                    <td className="text-[13px]" style={{ color: 'var(--text2)' }}>{e.bf ? `${e.bf}%` : '—'}</td>
-                    <td className="text-xs" style={{ color: 'var(--accent)' }}>{lbm !== '—' ? `${lbm} lbs` : '—'}</td>
-                    <td className="text-xs" style={{ color: 'var(--text2)' }}>{e.macros?.calories ? `${e.macros.calories}` : '—'}</td>
-                    <td className="text-xs" style={{ color: '#42c8f5' }}>{e.macros?.protein ? `${e.macros.protein}g` : '—'}</td>
+                    <td className="" style={{ color: 'var(--text2)' }}>{fmtDate(e.date)}</td>
+                    <td className=" font-semibold" style={{ color: 'var(--text)' }}>{e.weight ? `${e.weight} lbs` : '—'}</td>
+                    <td className="" style={{ color: 'var(--text2)' }}>{e.bf ? `${e.bf}%` : '—'}</td>
+                    <td className="" style={{ color: 'var(--accent)' }}>{lbm !== '—' ? `${lbm} lbs` : '—'}</td>
+                    {/* <td className="text-xs" style={{ color: 'var(--text2)' }}>{e.macros?.calories ? `${e.macros.calories}` : '—'}</td>
+                    <td className="text-xs" style={{ color: '#42c8f5' }}>{e.macros?.protein ? `${e.macros.protein}g` : '—'}</td> */}
                   </tr>
                 )
               })}

@@ -43,7 +43,7 @@ function BuilderExerciseRow({
       <div className="flex-1">
         <div className="text-[13px] font-semibold" style={{ color: 'var(--text)' }}>{ex.name}</div>
         <input
-          className="inp mt-1 px-1.5 py-[3px] text-[11px]"
+          className="inp mt-1 px-1.5 py-[3px]"
           placeholder="Rep range e.g. 8-12"
           value={ex.repRange || ''}
           onChange={e => onUpdate(idx, 'repRange', e.target.value)}
