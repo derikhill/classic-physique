@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from 'react'
 import { EXERCISE_LIBRARY, MUSCLES, type ExerciseTemplate, type MuscleKey } from '@/lib/constants'
+import MuscleChips from './MuscleChips'
 
 export type PickerMode = 'swap' | 'add'
 
@@ -22,7 +23,7 @@ export default function ExercisePickerModal({
 }) {
   const [search, setSearch] = useState('')
   const [customReps, setCustomReps] = useState('10-12')
-  const [customMuscle, setCustomMuscle] = useState<MuscleKey>('back')
+  const [customMuscles, setCustomMuscles] = useState<MuscleKey[]>([])
   const [saveToLibrary, setSaveToLibrary] = useState(true)
   const searchRef = useCallback((el: HTMLInputElement | null) => {
     if (el) setTimeout(() => el.focus(), 50)
@@ -36,8 +37,17 @@ export default function ExercisePickerModal({
     ...(customExercises || []).filter(ce => !EXERCISE_LIBRARY.some(e => e.name.toLowerCase() === ce.name.toLowerCase())),
   ]
 
+  // Built-in library filtered to muscle-relevant matches in swap mode.
+  // Customs always appear (regardless of muscle filter) so the user's hand-curated
+  // library is never hidden, even if their muscle tags don't perfectly overlap.
+  const customsOnly = (customExercises || []).filter(ce =>
+    !EXERCISE_LIBRARY.some(e => e.name.toLowerCase() === ce.name.toLowerCase()),
+  )
   const candidates = isSwap
-    ? fullLibrary.filter(e => e.name !== exercise?.name && e.muscles.some(m => targetMuscles.includes(m)))
+    ? [
+        ...EXERCISE_LIBRARY.filter(e => e.name !== exercise?.name && e.muscles.some(m => targetMuscles.includes(m))),
+        ...customsOnly.filter(ce => ce.name !== exercise?.name),
+      ]
     : fullLibrary
 
   const q = search.trim().toLowerCase()
@@ -54,9 +64,12 @@ export default function ExercisePickerModal({
 
   const handleAddCustom = () => {
     if (!q) return
+    const muscles: MuscleKey[] = isSwap
+      ? targetMuscles
+      : customMuscles.length > 0 ? customMuscles : ['back']
     const ex: ExerciseTemplate = {
       name: search.trim(),
-      muscles: isSwap ? targetMuscles : [customMuscle],
+      muscles,
       repRange: customReps,
       note: 'Custom exercise',
       custom: true,
@@ -98,20 +111,16 @@ export default function ExercisePickerModal({
           {isNewCustom && (
             <div className="mb-3 rounded-md border px-3.5 py-3" style={{ background: '#050f00', borderColor: 'var(--accent)' }}>
               <div className="mb-2.5 text-xs font-bold tracking-[1px]" style={{ color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>✦ NEW EXERCISE: {search.trim()}</div>
-              <div className="mb-2.5 flex flex-wrap gap-2.5">
-                <div>
-                  <div className="macro-lbl mb-1">Rep range</div>
-                  <input className="inp inp-sm w-[90px]" value={customReps} onChange={e => setCustomReps(e.target.value)} placeholder="e.g. 10-12" />
-                </div>
-                {!isSwap && (
-                  <div>
-                    <div className="macro-lbl mb-1">Muscle group</div>
-                    <select className="inp w-[130px]" value={customMuscle} onChange={e => setCustomMuscle(e.target.value as MuscleKey)}>
-                      {Object.entries(MUSCLES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
-                    </select>
-                  </div>
-                )}
+              <div className="mb-2.5">
+                <div className="macro-lbl mb-1">Rep range</div>
+                <input className="inp inp-sm w-[90px]" value={customReps} onChange={e => setCustomReps(e.target.value)} placeholder="e.g. 10-12" />
               </div>
+              {!isSwap && (
+                <div className="mb-2.5">
+                  <div className="macro-lbl mb-1">Muscles worked <span className="ml-1 normal-case" style={{ color: 'var(--text3)' }}>· tap to add, first = primary ★</span></div>
+                  <MuscleChips selected={customMuscles} onChange={setCustomMuscles} />
+                </div>
+              )}
               <div className="mb-2.5 flex items-center gap-2.5">
                 <div onClick={() => setSaveToLibrary(s => !s)} className="flex cursor-pointer items-center gap-1.5">
                   <div

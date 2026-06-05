@@ -214,6 +214,12 @@ export default function AppShell() {
     await updateSettings({ custom_exercises: updated })
   }
 
+  const handleUpdateCustomExercise = async (name: string, patch: Partial<ExerciseTemplate>) => {
+    const updated = customExercises.map(e => (e.name === name ? { ...e, ...patch } : e))
+    setCustomExercises(updated)
+    await updateSettings({ custom_exercises: updated })
+  }
+
   const handlePhaseGoals = async (goals: Record<string, PhaseGoal>) => {
     setPhaseGoals(goals)
     await updateSettings({ phase_goals: goals })
@@ -339,6 +345,7 @@ export default function AppShell() {
           customExercises={customExercises}
           onSaveCustomExercise={handleSaveCustomExercise}
           onDeleteCustomExercise={handleDeleteCustomExercise}
+          onUpdateCustomExercise={handleUpdateCustomExercise}
           splitOrder={splitOrder}
           onSplitOrder={handleSplitOrder}
           activeCoachSplit={activeCoachSplit}

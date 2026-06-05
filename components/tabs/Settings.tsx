@@ -12,6 +12,7 @@ import {
 import { callClaudeJSON, fmtDate, muscleVolume, type RecoveryContext, type Workout } from '@/lib/utils'
 import { analyzeProgramSwitch, type ProgramSwitchAnalysis } from '@/lib/progression'
 import CustomSplitBuilder, { type CoachSplit } from '@/components/shared/CustomSplitBuilder'
+import CustomLibraryRow from '@/components/shared/CustomLibraryRow'
 import ProgramEditor from '@/components/shared/ProgramEditor'
 import SplitDayRow from '@/components/shared/SplitDayRow'
 
@@ -61,6 +62,7 @@ export default function Settings({
   customExercises,
   onSaveCustomExercise,
   onDeleteCustomExercise,
+  onUpdateCustomExercise,
   splitOrder,
   onSplitOrder,
   activeCoachSplit,
@@ -79,6 +81,7 @@ export default function Settings({
   customExercises: ExerciseTemplate[]
   onSaveCustomExercise: (ex: ExerciseTemplate) => void
   onDeleteCustomExercise: (name: string) => void
+  onUpdateCustomExercise: (name: string, patch: Partial<ExerciseTemplate>) => void
   splitOrder: string[] | null
   onSplitOrder: (order: string[] | null) => void
   activeCoachSplit: CoachSplit | null
@@ -838,19 +841,12 @@ Return ONLY valid JSON in this exact structure (no markdown, no explanation):
             <div className="mt-3">
               <div className="grid gap-1.5">
                 {customExercises.map((ex, i) => (
-                  <div key={i} className="flex items-center justify-between border-b py-1.5" style={{ borderColor: 'var(--border)' }}>
-                    <div>
-                      <div className="text-[13px] font-semibold" style={{ color: 'var(--text)' }}>{ex.name}</div>
-                      <div className="text-[11px]" style={{ color: 'var(--text3)' }}>
-                        {ex.muscles?.map(m => m.replace('_', ' ')).join(', ')} · {ex.repRange}
-                      </div>
-                    </div>
-                    <button
-                      className="btn btn-secondary btn-sm text-[11px]"
-                      style={{ color: 'var(--red)', borderColor: 'var(--red)' }}
-                      onClick={() => onDeleteCustomExercise(ex.name)}
-                    >Remove</button>
-                  </div>
+                  <CustomLibraryRow
+                    key={ex.name + i}
+                    exercise={ex}
+                    onUpdate={onUpdateCustomExercise}
+                    onDelete={onDeleteCustomExercise}
+                  />
                 ))}
               </div>
               <div className="mt-2 text-[11px]" style={{ color: 'var(--text3)' }}>
